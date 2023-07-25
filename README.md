@@ -13,9 +13,7 @@
 		<img src="https://img.shields.io/badge/Spring Tool Suite 3-007ACC?style=flat&logo=Java&logoColor=white" />
 		<img src="https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white" />
 	</div>
-	<a href="https://github.com/waz6432">
-		<img align="center" style="height:180px" src="https://github-readme-stats.vercel.app/api/top-langs/?username=waz6432&layout=compact&theme=nord&hide_border=true" />
-	</a>
+	<a href="https://github.com/waz6432"><img align="center" style="height:180px" src="https://github-readme-stats.vercel.app/api/top-langs/?username=waz6432&layout=compact&theme=nord&hide_border=true" /></a>
 </div>
 
 
