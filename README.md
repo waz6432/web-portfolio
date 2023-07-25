@@ -21,8 +21,13 @@
 	<img src="https://img.shields.io/badge/Spring Tool Suite 3-007ACC?style=flat&logo=Java&logoColor=white" />
 	<img src="https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white" />
 </div>
+<br>
 
-<a href="https://github.com/waz6432"><img align="center" style="height:180px" src="https://github-readme-stats.vercel.app/api/top-langs/?username=waz6432&layout=compact&theme=nord&hide_border=true" /></a>
+
+<div align=Center>
+	<p>My Github State</p>
+	<a href="https://github.com/waz6432"><img align="center" style="height:180px" src="https://github-readme-stats.vercel.app/api/top-langs/?username=waz6432&layout=compact&theme=nord&hide_border=true" /></a>
+</div>
 
 # 프로젝트 <img src="https://user-images.githubusercontent.com/103208820/210212608-e28cdd0e-d35e-44b2-b65b-69003b248ea4.png"  width="30" height="30"/>
 
