@@ -16,9 +16,6 @@
 	<a href="https://github.com/waz6432"><img align="center" style="height:180px" src="https://github-readme-stats.vercel.app/api/top-langs/?username=waz6432&layout=compact&theme=nord&hide_border=true" /></a>
 </div>
 
-
-<a href="https://github.com/waz6432"><img align="center" style="height:180px" src="https://github-readme-stats.vercel.app/api/top-langs/?username=waz6432&layout=compact&theme=nord&hide_border=true" /></a>
-
 # 프로젝트 <img src="https://user-images.githubusercontent.com/103208820/210212608-e28cdd0e-d35e-44b2-b65b-69003b248ea4.png"  width="30" height="30"/>
 
 TripStation은 여행 동행을 찾는 사람들을 위한 웹사이트입니다. 사용자는 원하는 여행지와 일정을 입력하면, 같은 여행지를 방문하는 다른 여행자들을 찾아볼 수 있습니다.
