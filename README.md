@@ -21,3 +21,7 @@
 	<img src="https://img.shields.io/badge/Spring Tool Suite 3-007ACC?style=flat&logo=Java&logoColor=white" />
 	<img src="https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white" />
 </div>
+
+# 프로젝트 <img src="https://user-images.githubusercontent.com/103208820/210212608-e28cdd0e-d35e-44b2-b65b-69003b248ea4.png"  width="30" height="30"/>
+
+TripStation은 여행 동행을 찾는 사람들을 위한 웹사이트입니다. 여행 동행을 찾는 역이라는 뜻으로 여행을 더욱 특별하고 잊지 못할 경험으로 만들기 위해, 같은 목적지로 향하는 여행자들을 연결해주는 플랫폼을 제공합니다.
