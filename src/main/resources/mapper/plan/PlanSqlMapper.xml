@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.travel.plan.mapper.PlanSqlMapper">
+   
+   <select id="createPlanPk" resultType="int">
+      select plan_seq.nextval from dual
+   </select>
+   
+   <!-- 참조없이 플래너 입력 -->
+   <insert id="planInsert">
+      INSERT INTO plan VALUES(
+       #{plan_id},
+       #{user_id},
+       #{plan_title},
+       0,
+       '없음',
+       #{plan_thumbnail},
+       '비공개',
+       '등록'
+      )
+   </insert>
+   
+   <!-- 참조하기 플래너 입력 -->
+   <insert id="copyPlanInsert">
+       INSERT INTO plan VALUES(
+       #{plan_id},
+       #{user_id},
+       #{plan_title},
+       #{referenced_plan_id},
+       #{plan_content},
+       #{plan_thumbnail},
+       '비공개',
+       '등록'
+      )
+   </insert>
+   
+   <!-- 0724수정 시작 일정담기 -->         
+   <insert id="insertPlan" parameterType="com.ja.travel.dto.PlanDto">
+       <selectKey keyProperty="plan_id" resultType="int" order="AFTER">
+           SELECT plan_seq.currval FROM dual
+       </selectKey>
+       INSERT INTO plan
+       (plan_id, user_id, plan_title, referenced_plan_id, plan_content, plan_thumbnail, plan_disclosure_status, plan_statuse)
+       VALUES
+       (plan_seq.NEXTVAL, #{user_id}, #{plan_title}, #{referenced_plan_id}, #{plan_content}, #{plan_thumbnail}, '비공개', '등록')
+   </insert>
+   
+   <insert id="insertPlanDay" parameterType="com.ja.travel.dto.PlanDayDto">
+       <selectKey keyProperty="plan_day_id" resultType="int" order="AFTER">
+           SELECT plan_day_seq.currval FROM dual
+       </selectKey>
+       INSERT INTO plan_day
+       (plan_day_id, plan_id, plan_day)
+       VALUES
+       (plan_day_seq.NEXTVAL, #{plan_id}, #{plan_day})
+   </insert>
+
+   
+   <insert id="insertPlanDayCity2" parameterType="com.ja.travel.dto.PlanDayCityDto">
+    <selectKey keyProperty="plan_day_city_id" resultType="int" order="AFTER">
+        SELECT plan_day_city_seq.currval FROM dual
+    </selectKey>
+       INSERT INTO plan_day_city
+       (plan_day_city_id, plan_day_id, plan_city_id)
+       VALUES
+       (plan_day_city_seq.NEXTVAL, #{plan_day_id}, #{plan_city_id})
+   </insert>
+
+   <select id="getPlanDayCity" resultType="com.ja.travel.dto.PlanDayCityDto">
+       SELECT * FROM plan_day_city WHERE plan_day_id=#{planDayId}
+   </select>
+   
+   <select id="getPlanRouteCity" parameterType="int" resultType="com.ja.travel.dto.PlanRouteCityDto">
+       SELECT * FROM plan_route_city WHERE plan_day_city_id=#{planDayCityId}
+   </select>
+   
+   <insert id="insertPlanRouteCity2" parameterType="com.ja.travel.dto.PlanRouteCityDto">
+       INSERT INTO plan_route_city(plan_route_city_id, plan_place_id, plan_day_city_id) 
+       VALUES(plan_route_city_seq.NEXTVAL, #{plan_place_id}, #{plan_day_city_id})
+   </insert>
+   
+      
+   <!-- 0724수정 끝 -->
+   
+   <!-- 플래너 목록 출력 -->
+   <select id="planSelectAll" resultType="com.ja.travel.dto.PlanDto">
+      SELECT * FROM plan
+      ORDER BY plan_id DESC
+   </select>
+   
+   <!-- 플래너 제목, 내용, 제목+내용 검색 -->   
+   <select id="searchPlan" resultType="com.ja.travel.dto.PlanDto">
+       SELECT * FROM plan
+       <where>
+           <if test="type == null">
+               <!-- 카테고리가 선택되지 않았을 경우, 모든 결과를 반환 -->
+           </if>
+           <if test="type == 'title'">
+               AND plan_title LIKE '%' || #{word} ||'%'
+           </if>
+           <if test="type == 'content'">
+               AND plan_content LIKE '%' || #{word} ||'%'
+           </if>
+           <if test="type == 'titleAndContent'">
+               AND (plan_title LIKE '%' || #{word} ||'%' OR plan_content LIKE '%' || #{word} ||'%')
+           </if>
+       </where>
+       ORDER BY plan_id DESC
+   </select>
+   
+   
+   <!-- 플래너 아이디별 플래너 목록 출력 -->
+   <select id="selectById" resultType="com.ja.travel.dto.PlanDto">
+      select *
+      from plan
+      where plan_id = #{plan_id}
+   </select>
+      
+   <select id="createPlanDayPk" resultType="int">
+      select
+      plan_day_seq.nextval from dual
+   </select>
+
+   <!-- 플래너 아이디별 날짜별 플래너 목록 출력 -->
+   <select id="getPlanDayByplan_id" resultType="com.ja.travel.dto.PlanDayDto">
+      SELECT * FROM plan_day where plan_id = #{plan_id}
+   </select>
+
+   <!-- 플래너 일정 입력 -->
+   <insert id="planDayInsert">
+      INSERT INTO plan_day VALUES(
+      #{plan_day_id},
+      #{plan_id},
+      #{plan_day}   
+      )
+   </insert>
+   
+   <!-- 플래너 일정 초기 입력 -->
+   <insert id="newPlanDayInsert">
+      INSERT INTO plan_day VALUES(
+      #{plan_day_id},
+      #{plan_id},
+      1   
+      )   
+   </insert>
+   
+   <!-- 플래너 일정 날짜 입력 -->
+   <select id="getMaxPlanDay" resultType="int">
+       SELECT MAX(plan_day) FROM plan_day WHERE plan_id = #{plan_id}
+   </select>
+   
+   <!-- 플래너 일정 목록 출력 -->
+   <select id="planDaySelect" resultType="com.ja.travel.dto.PlanDayDto">
+      select * from plan_day WHERE plan_id=#{plan_id} ORDER BY plan_day 
+   </select>
+   
+   <!-- 플래너 아이디별 일정 목록 출력 -->
+   <select id="planDaySelectByplan_id" resultType="com.ja.travel.dto.PlanDayDto">
+      select * from plan_day where plan_id = #{plan_id}   
+   </select>
+   
+   <!-- 지역 리스트 -->
+   <select id="planCitySelect" resultType="com.ja.travel.dto.PlanCityDto">
+      select * from plan_city order by plan_city_id 
+   </select>
+   
+   <select id="createPlanDayCityPk" resultType="int">
+      select
+      plan_day_city_seq.nextval from dual
+   </select>
+   
+   <!-- 플랜 일자별 도시 입력 -->
+   <insert id="planDayCityInsert">
+      INSERT INTO plan_day_city VALUES(
+      #{plan_day_city_id},
+      #{plan_day_id},
+      #{plan_city_id}
+      )
+   </insert>
+   
+   <!-- 플랜 일자별 도시 목록 출력 -->
+   <select id="planDayCitySelect" resultType="com.ja.travel.dto.PlanDayCityDto">
+        select * from plan_day_city where plan_day_id = #{plan_day_id}
+   </select>
+
+   <!-- 날짜별 지역 목록 리스트 -->
+   <select id="planCityByPlanCityId" resultType="com.ja.travel.dto.PlanCityDto">
+      select * from plan_city where plan_city_id = #{plan_city_id}
+   </select>
+   
+   <select id="planCityByPlanCityIdSelect" resultType="com.ja.travel.dto.PlanCityDto">
+      select * from plan_city where plan_city_id = #{plan_city_id}   
+   </select>
+   
+   <!-- 플랜 도시별 명소 목록 -->
+   <select id="planPlaceByPlanCityId" resultType="com.ja.travel.dto.PlanPlaceDto">
+      SELECT * FROM plan_place where plan_city_id = #{plan_city_id} 
+   </select>
+   
+   <!-- 플래너 명소 아이디별 명소 리스트 -->
+   <select id="planPlaceByPlanPlaceId" resultType="com.ja.travel.dto.PlanPlaceDto">
+      SELECT * FROM plan_place where plan_place_id = #{plan_place_id}   
+   </select>
+   
+   <select id="createPlanRouteCityPk" resultType="int">
+      select
+      plan_route_city_seq.nextval from dual
+   </select>
+   
+   <!-- 플랜 루트 시티 입력 -->
+   <insert id="planRouteCityInsert">
+      INSERT INTO plan_route_city VALUES(
+      #{plan_route_city_id},
+      #{plan_place_id},
+      #{plan_day_city_id}
+      )
+   </insert>
+   
+   <!-- 플랜 루트 시티 조회 -->
+   <select id="planRouteByPlanDayCityId" resultType="com.ja.travel.dto.PlanRouteCityDto">
+      SELECT * FROM plan_route_city where plan_day_city_id = #{plan_day_city_id}
+   </select>
+   
+   <!-- 글삭제 -->
+   <delete id="deleteById">
+      DELETE FROM plan WHERE plan_id = #{plan_id}
+   </delete>
+
+   <!-- 플랜 수정 -->
+   <update id="update">
+      UPDATE plan
+      SET 
+      plan_title = #{plan_title},      
+      plan_thumbnail = #{plan_thumbnail},
+      plan_disclosure_status = #{plan_disclosure_status}      
+      WHERE plan_id = #{plan_id}
+   </update>
+
+   <!-- 공개 비공개 수정 -->
+   <update id="updateDisclosureStatus">
+      UPDATE plan
+      SET
+      plan_title = #{plan_title},
+      plan_disclosure_status = #{plan_disclosure_status}
+      WHERE plan_id = #{plan_id}
+   </update>
+   
+   <select id="selectGuideByuser_id" resultType="boolean">
+   
+      SELECT * FROM guide WHERE user_id = #{user_id}
+   
+   </select>
+   
+   <select id="getGuide_idByuser_id" resultType="int">
+      SELECT guide_id FROM guide WHERE user_id = #{user_id}
+   </select>
+   
+   <select id="getPlaceList" resultType = "com.ja.travel.dto.PlanPlaceDto">
+      SELECT * FROM plan_place 
+   </select>
+   
+   <select id ="loadCityList" resultType="com.ja.travel.dto.PlanCityDto">
+      SELECT * FROM plan_city
+         <if test = "searchType != null and searchWord == null">
+            <choose>
+               <when test = "searchType == '전체'">
+                  ORDER BY plan_city_id DESC
+               </when>
+               <when test = "searchType == '서울특별시'">
+                  WHERE plan_city_name Like '%서울%'
+               </when>
+               <when test = "searchType == '경기도'">
+                  WHERE plan_city_name Like '%경기%'
+               </when>
+               <when test = "searchType == '강원도'">
+                  WHERE plan_city_name Like '%강원%'
+               </when>
+               <when test = "searchType== '충청북도'">
+                  WHERE plan_city_name Like '%충북%'
+               </when>
+               <when test = "searchType == '충청남도'">
+                  WHERE plan_city_name Like '%충남%'
+               </when>
+               <when test = "searchType == '경상북도'">
+                  WHERE plan_city_name Like '%경북%'
+               </when>
+               <when test = "searchType == '경상남도'">
+                  WHERE plan_city_name Like '%경남%'
+               </when>
+               <when test = "searchType == '전라북도'">
+                  WHERE plan_city_name Like '%전북%'   
+               </when>
+               <when test = "searchType == '전라남도'">
+                  WHERE plan_city_name Like '%전남%'
+               </when>
+               <when test = "searchType == '제주도'">
+                  WHERE plan_city_name Like '%제주%'
+               </when>               
+            </choose>
+         </if>
+         <if test="searchType != null and searchWord!= null">
+                  WHERE plan_city_name LIKE '%' || #{searchWord} ||'%'
+                  ORDER BY plan_city_id DESC
+
+         </if>
+   </select>
+   
+   <select id="getAllCity" resultType = "com.ja.travel.dto.PlanCityDto">
+      SELECT * FROM plan_city 
+   </select>
+   
+   
+   <select id="planCitySelect2" resultType="com.ja.travel.dto.PlanCityDto">
+      select * from plan_city
+      where plan_city_name like '%' || #{word1} || '%'
+      and plan_city_name like '%' || #{word2} || '%'
+      order by plan_city_id
+   </select>
+
+   <select id="planPlaceSelectAll2" resultType="com.ja.travel.dto.PlanPlaceDto">
+      SELECT * FROM plan_place
+      WHERE plan_city_id = #{cityId}
+      AND plan_place_name LIKE '%' || #{word} ||'%'
+      ORDER BY plan_place_id ASC
+   </select>
+
+
+   <select id="get1" resultType="com.ja.travel.dto.PlanDayCityDto">
+      select * from plan_day_city
+      where plan_day_id = #{dayId}
+   </select>
+   <select id="get2" resultType="com.ja.travel.dto.PlanRouteCityDto">
+      select * from plan_route_city
+      where plan_day_city_id = #{dayCityId}
+   </select>
+   <select id="get3" resultType="com.ja.travel.dto.PlanCityDto">
+      select * from plan_city
+      where plan_city_id = #{cityId}
+   </select>
+   <select id="get4" resultType="com.ja.travel.dto.PlanPlaceDto">
+      select * from plan_place
+      where plan_place_id = #{placeId}
+   </select>
+   
+   <!-- 명소 선택시 두 테이블 동시 입력 시작 -->
+   <select id="getPlanDayCityByCityIdAndDayId" resultType="com.ja.travel.dto.PlanDayCityDto">
+      select * from plan_day_city
+      where plan_day_id = #{dayId} 
+      and plan_city_id = #{cityId}
+   </select>
+   <insert id="insertPlanDayCity">
+        INSERT INTO plan_day_city (plan_day_city_id, plan_day_id, plan_city_id)
+        VALUES (plan_day_city_seq.NEXTVAL, #{planDayId}, #{planCityId})
+    </insert>
+    <insert id="insertPlanRouteCity">
+        INSERT INTO plan_route_city (plan_route_city_id, plan_place_id, plan_day_city_id)
+        VALUES (plan_route_city_seq.NEXTVAL, #{planPlaceId}, #{planDayCityId})
+    </insert>
+    <!-- 명소 선택시 두 테이블 동시 입력 끝 -->
+   
+   <select id="getAllPlace2" resultType="com.ja.travel.dto.PlanPlaceDto">
+      SELECT * FROM plan_place 
+   </select>
+   
+   <select id="getPlan" resultType="com.ja.travel.dto.PlanDto">
+      SELECT * FROM plan WHERE plan_id=#{plan_id}
+   </select>
+   
+   <delete id="deleteDay">
+      DELETE FROM plan_day WHERE plan_id = #{planId} and plan_day_id=#{dayId}
+   </delete>
+   
+   <select id="getPlanDay" resultType="com.ja.travel.dto.PlanDayDto">
+      
+      SELECT * FROM plan_day WHERE plan_id=#{planId} ORDER BY plan_day
+      
+   </select>
+   
+   <update id="updateDays">
+      
+      UPDATE plan_day
+      SET
+      plan_day = #{plan_day}
+      WHERE plan_day_id = #{plan_day_id}
+   
+   </update>
+   
+   <select id="getRouteList" resultType="com.ja.travel.dto.PlanRouteCityDto">
+   
+      SELECT * from plan_route_city WHERE plan_day_city_id=#{plan_day_city_id}
+      
+   </select>
+
+</mapper>

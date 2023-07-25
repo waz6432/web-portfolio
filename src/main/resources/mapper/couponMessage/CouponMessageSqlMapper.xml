@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.travel.couponMessage.mapper.CouponMessageSqlMapper">
+
+<select id="getPlanList" resultType="com.ja.travel.dto.PlanDto">
+	SELECT * FROM plan
+	WHERE user_id = #{user_id}
+</select>
+
+<select id="getGuideDtoByUserId" resultType="com.ja.travel.dto.GuideDto">
+	SELECT * FROM guide
+	WHERE user_id = #{user_id}
+</select>
+
+<select id ="getGuideRestrictDtoByGuideId" resultType="com.ja.travel.dto.GuideRestrictDto">
+	SELECT * FROM guide_restrict
+	WHERE guide_id = #{guide_id}
+		AND guide_restrict_end_date > SYSDATE
+</select>
+
+<select id="getGuideReportDtoByGuideReportId" resultType="com.ja.travel.dto.GuideReportDto">
+	SELECT * FROM guide_report
+	WHERE guide_report_id = #{guide_report_id}
+</select>
+
+<select id="getGuidePlanningDtoByGuidePlanningId" resultType="com.ja.travel.dto.GuidePlanningDto">
+	SELECT * FROM guide_planningF
+	WHERE guide_planning_id = #{guide_planning_id}
+</select>
+
+<select id="getPlanDtoByPlanId" resultType="com.ja.travel.dto.PlanDto">
+	SELECT * FROM plan
+	WHERE plan_id = #{plan_id}
+</select>
+
+<select id="getCouponList" resultType="com.ja.travel.dto.CouponDto">
+	SELECT * FROM coupon
+</select>
+
+<update id="decreaseCoupon">
+	UPDATE coupon
+	SET
+		coupon_amount = coupon_amount - 1
+	WHERE coupon_id = #{couponId}
+</update>
+
+<select id="createUserCouponPk" resultType="int">
+	SELECT user_coupon_seq.nextval FROM DUAL
+</select>
+
+<insert id="insertUserCoupon">
+	INSERT INTO user_coupon VALUES(
+		#{user_coupon_id},
+		#{user_id},
+		#{coupon_id}
+	)
+</insert>
+
+<select id="getUserCouponByUserId" resultType="com.ja.travel.dto.UserCouponDto">
+	SELECT * FROM user_coupon
+	WHERE user_id = #{user_id}
+</select>
+
+<select id="getUserCoupon" resultType="com.ja.travel.dto.UserCouponDto">
+	SELECT * FROM user_coupon
+	WHERE user_id = #{user_id} 
+	 and  coupon_id = #{coupon_id}
+</select>
+
+<update id="updateStateSoldOut">
+	UPDATE coupon
+	SET
+		coupon_status = '소진'
+	WHERE coupon_id = #{coupon_id} 
+	AND coupon_amount = 0
+</update>
+
+<update id="updateStateDateOver">
+	UPDATE coupon
+	SET
+		coupon_status = '발급기간 만료'
+	WHERE coupon_id = #{coupon_id}
+	AND  SYSDATE > coupon_issue_end	
+</update>
+
+<select id="createMessagePk" resultType="int">
+	SELECT message_seq.nextval FROM DUAL
+</select>
+
+<insert id="insertMessage">
+	INSERT INTO message VALUES(
+		#{message_id},
+		#{user_id},
+		#{user_nickname},
+		#{message_title},
+		#{message_content},
+		SYSDATE,
+		NULL,
+		NULL
+	)
+</insert>
+
+<select id="getUserByUserNickName" resultType="com.ja.travel.dto.UserDto">
+	SELECT * FROM member
+	WHERE user_nickname = #{user_nickname}
+</select>
+
+<select id="getUserDtoByUserId" resultType="com.ja.travel.dto.UserDto">
+	SELECT * FROM member
+	WHERE user_id = #{user_id}
+</select>
+
+<select id="selectAllMessageGotByNickName" resultType="com.ja.travel.dto.MessageDto">
+	SELECT * FROM message
+	WHERE user_nickname = #{user_nickname}
+	ORDER BY message_reg_date DESC
+</select>
+
+<update id="updateReadDate">
+	UPDATE message
+	SET
+		message_read_date = SYSDATE
+	WHERE message_id = #{messageId}
+</update>
+
+<select id="getMessageDtoByMessageId" resultType="com.ja.travel.dto.MessageDto">
+	SELECT * FROM message
+	WHERE message_id = #{message_id}
+</select>
+
+<select id="selectAllMessageWroteByUserId" resultType="com.ja.travel.dto.MessageDto">
+	SELECT * FROM message
+	WHERE user_id = #{user_id}
+</select>
+
+<insert id="insertUserCoupon2">
+	INSERT INTO user_coupon VALUES(
+		#{user_coupon_id},
+		#{user_id},
+		#{coupon_id}
+	)
+</insert>
+
+<select id="countCoupon" resultType="int">
+	SELECT count(*) FROM user_coupon
+	WHERE user_id = #{user_id}
+		AND coupon_id = #{coupon_id}
+</select>
+
+<select id="checkExpired" resultType="int">
+	SELECT count(*) FROM coupon
+	WHERE coupon_id = #{couponId}
+	AND SYSDATE > coupon_issue_end
+</select>
+
+<select id="checkExhausted" resultType="int">
+	SELECT count(*) FROM coupon
+	WHERE coupon_id = #{couponId}
+	AND coupon_amount = 0
+</select>
+
+<update id="messageReceiverDelete">
+	UPDATE message
+	SET message_status = CONCAT('받은쪽지삭제', message_status)
+	WHERE message_id = #{messageId}
+</update>
+
+
+<update id="messageSendDelete">
+	UPDATE message
+	SET message_status = CONCAT('보낸쪽지삭제', message_status)
+	WHERE message_id = #{messageId}
+</update>
+
+<select id="getMessageInTrashList" resultType="com.ja.travel.dto.MessageDto">
+	SELECT * FROM message
+	WHERE (user_id = #{userId} and message_status like '%보낸쪽지삭제%') OR (user_nickname = #{userNickName} and message_status like '%받은쪽지삭제%')
+	ORDER BY message_reg_date DESC
+</select>
+
+<delete id="deleteMessagePerman">
+	DELETE FROM message
+	WHERE message_id = #{messageId}
+</delete>
+
+<select id="getMessageInStorageList" resultType="com.ja.travel.dto.MessageDto">
+	SELECT * FROM message
+	WHERE (user_id = #{userId} and message_status like '%보낸쪽지보관%') OR (user_nickname = #{userNickName} and message_status like '%받은쪽지보관%')
+	ORDER BY message_reg_date DESC
+</select>
+
+<update id="updateMessageSendNotStored">
+	UPDATE message
+	SET message_status = REPLACE(message_status, '보낸쪽지보관', '')
+	WHERE message_id = #{messageId}	
+</update>
+
+<update id="updateMessageSendStored">
+	UPDATE message
+	SET message_status = CONCAT('보낸쪽지보관', message_status)
+	WHERE message_id = #{messageId}	
+</update>
+
+<update id="updateMessageGetNotStored">
+	UPDATE message
+	SET message_status = REPLACE(message_status, '받은쪽지보관', '')
+	WHERE message_id = #{messageId}	
+</update>
+
+<update id="updateMessageGetStored">
+	UPDATE message
+	SET message_status = CONCAT('받은쪽지보관', message_status)
+	WHERE message_id = #{messageId}	
+</update>
+
+<select id = "checkStored" resultType="int">
+	SELECT COUNT(*) from message
+	WHERE (user_id = #{userId} and message_status like '%보낸쪽지보관%') OR (user_nickname = #{userNickName} and message_status like '%받은쪽지보관%')
+			AND (message_id = #{messageId})
+</select>
+</mapper>

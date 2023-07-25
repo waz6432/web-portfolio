@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.travel.admin.mapper.AdminSqlMapper">
+
+<select id="getIdAndPw" parameterType="com.ja.travel.dto.AdminDto" resultType="com.ja.travel.dto.AdminDto">
+	SELECT * FROM ADMIN
+	WHERE admin_userid = #{admin_userid} AND admin_pw = #{admin_pw}
+</select>
+
+
+
+<select id="createPk" resultType="int">
+	SELECT plan_city_seq.nextval FROM DUAL
+</select>
+
+<insert id="setCity">
+	INSERT INTO plan_city VALUES(
+    #{plan_city_id},
+    #{plan_city_name}
+)
+</insert>
+
+<select id="selectAllCity" resultType="com.ja.travel.dto.PlanCityDto">
+	SELECT * FROM plan_city
+</select>
+
+
+<select id="selectBigCityNameByCityId" resultType="int">
+	SELECT big_city_id FROM plan_city
+	WHERE plan_city_id = #{plan_city_id}
+	
+</select>
+
+<select id="selectCityById" resultType="com.ja.travel.dto.PlanCityDto">
+	SELECT * FROM plan_city
+	WHERE plan_city_id = #{plan_city_id}
+</select>
+
+
+<delete id="deleteCityById">
+	DELETE FROM plan_city
+	WHERE plan_city_id = #{plan_city_id}
+</delete>
+
+<select id="selectAllApply" resultType="com.ja.travel.dto.GuideApplyDto">
+	SELECT * FROM guide_apply
+	ORDER BY guide_apply_id DESC
+</select>
+
+<select id="selectGuideApplyById" resultType="com.ja.travel.dto.GuideApplyDto">
+	SELECT * FROM guide_apply
+	WHERE guide_apply_id = #{guide_apply_id}
+</select>
+
+<update id="updateGuideApply">
+	UPDATE guide_apply
+	SET	guide_apply_state = '승인',
+		guide_apply_message = #{guide_apply_message}
+	WHERE guide_apply_id = #{guide_apply_id}
+</update>
+
+<select id="createGuidePk" resultType="int">
+	SELECT guide_seq.nextval from dual
+</select>
+
+<insert id="insertGuide">
+	INSERT INTO guide VALUES(
+		#{guide_id},
+		#{user_id},
+		#{admin_id},
+		#{guide_apply_date},
+		#{guide_profile},
+		#{guide_name},
+		SYSDATE
+	)
+</insert>
+
+<select id="checkUser" resultType="com.ja.travel.dto.GuideDto">
+	SELECT * FROM guide
+	WHERE user_id = #{user_id}
+</select>
+
+<select id="getGuideByUserId" resultType="com.ja.travel.dto.GuideDto">
+	SELECT * FROM GUIDE
+	WHERE user_id = #{user_id}
+</select>
+
+<select id="getUserDtoByUserId" resultType="com.ja.travel.dto.UserDto">
+	SELECT * FROM MEMBER
+	WHERE user_id = #{user_id}
+</select>
+
+<update id="updateGuideReject">
+	UPDATE guide_apply
+	SET
+		guide_apply_state = '거절',
+		guide_apply_message = #{guide_apply_message}
+	WHERE guide_apply_id = #{guide_apply_id}
+</update>
+
+
+<select id="getUserReportList" resultType="com.ja.travel.dto.UserReportDto">
+	SELECT *
+	FROM (
+	  SELECT user_report.*,
+			ROW_NUMBER() OVER (PARTITION BY user_id, reported_user_id, user_report_reg_date 
+			ORDER BY user_report_id DESC) rn
+	  FROM user_report
+	)
+	WHERE rn = 1
+	ORDER BY user_report_id DESC
+</select>
+
+<select id="getUserDtoByReportedUserId" resultType="com.ja.travel.dto.UserDto">
+	SELECT * FROM MEMBER
+	WHERE user_id = #{user_id}
+</select>
+
+<select id="getUserReportDtoByUserReportId" resultType="com.ja.travel.dto.UserReportDto">
+	SELECT * FROM user_report
+	WHERE user_report_id = #{user_report_id}
+</select>
+
+<select id="getUserReportDtoListByUserReportId" resultType="com.ja.travel.dto.UserReportDto">
+	SELECT *
+	FROM user_report
+	WHERE user_report_reg_date = (
+	  SELECT user_report_reg_date
+	  FROM user_report
+	  WHERE user_report_id =#{id} 
+	)
+	ORDER BY user_id, reported_user_id, user_report_id DESC
+</select>
+
+<select id="createUserRestrictPk" resultType="int">
+	SELECT member_restrict_seq.nextval FROM DUAL
+</select>
+
+<insert id="insertRestrictUser">
+	INSERT INTO member_restrict VALUES(
+		#{user_restrict_id},
+		#{user_id},
+		#{admin_id},
+		#{user_report_id},
+		#{user_restrict_duration},
+		SYSDATE,
+		SYSDATE + #{user_restrict_duration},
+		#{user_restrict_reason}
+	)
+</insert>
+
+<update id="updateUserReport">
+	UPDATE user_report
+	SET
+		admin_id = #{admin_id},
+		user_report_status = #{user_report_status},
+		user_report_resolved_date = SYSDATE
+	WHERE user_report_id = #{user_report_id}
+</update>
+
+<select id="getMemberRestrictDtoByUserReportId" resultType="com.ja.travel.dto.MemberRestrictDto">
+	SELECT * FROM member_restrict
+	WHERE user_report_id = #{user_report_id}
+</select>
+
+<select id="getReportedGuideList" resultType="com.ja.travel.dto.GuideReportDto">
+	SELECT * FROM guide_report
+	ORDER BY guide_report_id DESC
+</select>
+
+<select id="getGuidePlanningDtoById" resultType="com.ja.travel.dto.GuidePlanningDto">
+	SELECT * FROM guide_planning
+	WHERE guide_planning_id = #{guide_planning_id}
+</select>
+
+<select id="getGuideDtoByGuideId" resultType="com.ja.travel.dto.GuideDto">
+	SELECT * FROM guide
+	WHERE guide_id = #{guide_id}
+</select>
+
+<select id="getGuideReportDtoById" resultType="com.ja.travel.dto.GuideReportDto">
+	SELECT * FROM guide_report
+	WHERE guide_report_id = #{guide_report_id}
+</select>
+
+<select id="createRestrictGuidePk" resultType="int">
+	SELECT guide_restrict_seq.nextval from dual
+</select>
+
+<insert id="insertGuideRestrict">
+	INSERT INTO guide_restrict VALUES(
+		#{guide_restrict_id},
+		#{guide_id},
+		#{admin_id},
+		#{guide_report_id},
+		#{plan_id},
+		#{guide_restrict_duration},
+		SYSDATE,
+		SYSDATE + #{guide_restrict_duration},
+		#{guide_restrict_reason}		
+	)
+</insert>
+
+<update id="updateGuideReport">
+	UPDATE guide_report
+	SET
+		admin_id = #{admin_id},
+		guide_report_status = #{guide_report_status}
+	WHERE 
+		guide_report_id = #{guide_report_id}
+</update>
+
+<select id="getGuideRestrictDtoByGuideReportId" resultType="com.ja.travel.dto.GuideRestrictDto">
+	SELECT * FROM guide_restrict
+	WHERE guide_report_id = #{guide_report_id}
+</select>
+
+<select id="createCouponPk" resultType="int">
+	SELECT coupon_seq.nextval FROM dual
+</select>
+
+<insert id="insertNewCoupon">
+	INSERT INTO coupon VALUES(
+		#{coupon_id},
+		#{coupon_title},
+		#{coupon_content},
+		#{coupon_image},
+		#{coupon_issue_start},
+		#{coupon_issue_end},
+		#{coupon_use_end},
+		#{coupon_discount},
+		#{coupon_amount},
+		''
+	)
+</insert>
+
+<select id="getCouponList" resultType="com.ja.travel.dto.CouponDto">
+	SELECT * FROM coupon
+</select>
+
+<select id="getCouponByCouponId" resultType="com.ja.travel.dto.CouponDto">
+	SELECT * FROM coupon
+	WHERE coupon_id = #{coupon_id}
+</select>
+
+<update id="updateCoupon">
+	UPDATE coupon
+	SET
+		coupon_title = #{coupon_title},
+		coupon_content = #{coupon_content},
+		coupon_image = #{coupon_image},
+		coupon_issue_start = #{coupon_issue_start},
+		coupon_issue_end = #{coupon_issue_end},
+		coupon_use_end = #{coupon_use_end},
+		coupon_discount = #{coupon_discount},
+		coupon_amount = #{coupon_amount}
+	WHERE coupon_id = #{coupon_id}
+</update>
+
+<insert id="insertUserReport">
+	INSERT INTO user_report
+	VALUES
+		(
+			user_report_seq.nextval,
+			'',
+			#{user_id},
+			#{reported_user_id},
+			'미처리',
+			SYSDATE,
+			#{user_report_desc},
+			'',
+			#{user_report_attached}
+		)
+</insert>
+
+</mapper>

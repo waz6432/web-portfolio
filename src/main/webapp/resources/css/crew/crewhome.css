@@ -1,0 +1,38 @@
+#card1 {
+	height: 70vh;
+	/* 다른 스타일 속성들 */
+	border-color: gray;
+	background-color: #f2f2f2;
+	overflow: scroll;
+}
+
+.txt {
+	margin-top: 10px;
+	color: grey;
+	font-size: 13px;
+}
+
+.larger {
+	font-size: 30px;
+}
+
+.card2 {
+	background-color: #f2f2f2;
+}
+
+.boardinfo {
+	font-size: 13px;
+}
+
+.displayoff {
+	
+}
+
+.hidden {
+	display: none;
+}
+
+a.cardselect {
+  color: inherit; /* 링크의 색상을 상속 받음 */
+  text-decoration: none; /* 밑줄 제거 */
+}

@@ -1,0 +1,16 @@
+.card {
+	background-color: #f2f2f2;
+}
+
+.title{
+	font-size: 30px;
+}
+
+.title2 {
+	font-size: 20px;
+}
+
+a.link {
+  color: inherit; /* 링크의 색상을 상속 받음 */
+  text-decoration: none; /* 밑줄 제거 */
+}

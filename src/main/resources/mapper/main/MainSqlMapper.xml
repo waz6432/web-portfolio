@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.travel.main.mapper.MainSqlMapper">
+
+	<select id="getPlanList" resultType="com.ja.travel.dto.PlanDto">
+		SELECT * FROM plan
+		WHERE user_id = #{user_id}
+		ORDER BY plan_id DESC
+	</select>
+
+	<select id="getGuideDtoByUserId" resultType="com.ja.travel.dto.GuideDto">
+		SELECT * FROM guide
+		WHERE user_id = #{user_id}
+	</select>
+
+	<select id="getGuideRestrictDtoByGuideId" resultType="com.ja.travel.dto.GuideRestrictDto">
+		SELECT * FROM guide_restrict
+		WHERE guide_id = #{guide_id}
+		AND guide_restrict_end_date > SYSDATE
+	</select>
+
+	<select id="getGuideReportDtoByGuideReportId" resultType="com.ja.travel.dto.GuideReportDto">
+		SELECT * FROM guide_report
+		WHERE guide_report_id = #{guide_report_id}
+	</select>
+
+	<select id="getGuidePlanningDtoByGuidePlanningId" resultType="com.ja.travel.dto.GuidePlanningDto">
+		SELECT * FROM guide_planning
+		WHERE guide_planning_id = #{guide_planning_id}
+	</select>
+
+	<select id="getPlanDtoByPlanId" resultType="com.ja.travel.dto.PlanDto">
+		SELECT * FROM plan
+		WHERE plan_id = #{plan_id}
+	</select>
+
+	<select id="getMyPlanningList" resultType="com.ja.travel.dto.PlanningDto">
+		SELECT planning.* FROM planning_application
+		INNER JOIN member ON planning_application.user_id = member.user_id
+		INNER JOIN planning ON planning.planning_id =
+		planning_application.planning_id
+		WHERE member.user_id = #{user_id}
+		AND planning_member_status = '수락'
+		ORDER BY planning.planning_id DESC
+	</select>
+	
+	<select id="getApplicationList" resultType="com.ja.travel.dto.PlanningApplicationDto">
+		SELECT planning_application.* FROM planning
+		INNER JOIN planning_application ON planning.planning_id = planning_application.planning_id
+		WHERE planning.user_id = #{user_id}
+		AND planning_application.user_id != #{user_id}
+		ORDER BY planning_application_id DESC
+	</select>
+</mapper>

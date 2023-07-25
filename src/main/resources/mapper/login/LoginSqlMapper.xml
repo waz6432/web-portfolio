@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.travel.login.mapper.LoginSqlMapper">
+	<insert id="register">
+		insert into member values
+		(
+			member_seq.nextval,
+			#{user_email},
+			#{user_pw},
+			#{user_nickname},
+			#{user_phone},
+			#{user_gender},
+			null,
+			#{user_birth},
+			#{user_address},
+			sysdate
+		)
+	</insert>
+
+	<update id="updateProfilePicByUserId">
+		update member set user_image = #{saveFileName} where user_id = #{user_id}
+	</update>
+
+	<select id="getUserDtoByIdandPw" resultType="com.ja.travel.dto.UserDto">
+		select * from member where user_email = #{user_email} and user_pw = #{user_pw}
+	</select>
+	
+	<select id="selectById" resultType="com.ja.travel.dto.UserDto">
+		select * from member
+		where user_id = #{user_id}
+	</select>
+	
+	<select id="isNickname" resultType="com.ja.travel.dto.UserDto">
+		select * from member
+		where user_nickname = #{user_nickname}
+	</select>
+ 	
+ 	<select id="getRestrictedUser" resultType="com.ja.travel.dto.MemberRestrictDto">
+		SELECT * FROM member_restrict
+		<![CDATA[
+		WHERE user_id = #{user_id} AND user_restrict_end_date > SYSDATE
+		]]>
+	</select>
+	
+	<update id="updateNickname">
+		UPDATE member
+		SET user_nickname = #{user_nickname}
+		WHERE user_id = #{user_id}
+	</update>
+	
+	<insert id="kakaoRegister">
+		INSERT INTO member
+		(
+			user_id,
+			user_email,
+			user_pw,
+			user_nickname,
+			user_reg_date
+		)
+		VALUES
+		(
+			member_seq.nextval,
+			#{user_id},
+			#{user_id},
+			'카카오 유저' || kakao_member_seq.nextval,
+			SYSDATE
+		)
+	</insert>
+</mapper>

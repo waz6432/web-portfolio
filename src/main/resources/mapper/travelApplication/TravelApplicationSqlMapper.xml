@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.travel.travelApplication.mapper.TravelApplicationSqlMapper">
+
+	<select id="getLatestPlanningList" resultType="com.ja.travel.dto.PlanningDto">
+		<![CDATA[
+		SELECT planning.*, rownum FROM planning
+        WHERE planning_id != #{planning_id}
+		AND rownum <= 6
+		ORDER BY planning_id DESC
+		]]>
+	</select>
+	
+	<select id="getLikeByCommentIdAndUserId" resultType="com.ja.travel.dto.PlanningCommentLove">
+		SELECT * FROM planning_comment_love
+		WHERE planning_comment_id = #{planning_comment_id}
+		AND user_id = #{user_id}
+	</select>
+	
+	<select id="getRecursiveList" resultType="com.ja.travel.dto.PlanDto">
+		WITH recursive_plan (plan_id, user_id, plan_title, referenced_plan_id, plan_content, plan_thumbnail, plan_disclosure_status, plan_statuse) AS
+		(
+			SELECT plan_id, user_id, plan_title, referenced_plan_id, plan_content, plan_thumbnail, plan_disclosure_status, plan_statuse
+			FROM plan
+			WHERE plan_id = #{plan_id}
+			UNION ALL
+			SELECT p.plan_id, p.user_id, p.plan_title, p.referenced_plan_id, p.plan_content, p.plan_thumbnail, p.plan_disclosure_status, p.plan_statuse
+			FROM plan p
+			INNER JOIN recursive_plan rp ON p.referenced_plan_id = rp.plan_id
+		)
+		SELECT * FROM recursive_plan
+	</select>
+	<select id="getChatList" resultType="com.ja.travel.dto.PlanningChatDto">
+		SELECT planning_chat.* FROM planning
+		INNER JOIN planning_chat ON planning_chat.planning_id = planning.planning_id
+		WHERE planning.planning_id = #{planning_id}
+	</select>
+	
+	<insert id="insertMessage">
+		INSERT INTO
+		    planning_chat
+		VALUES
+		    (
+		        planning_chat_seq.nextval,
+		        #{user_id},
+		        #{planning_id},
+		        #{chat_message},
+		        SYSDATE
+		    )
+	</insert>
+	
+	<select id="getTotalLike" resultType="int">
+		SELECT COUNT(*) FROM planning_comment_love
+		WHERE planning_comment_id = #{planning_comment_id}
+	</select>
+	
+	<select id="getCommentList" resultType="com.ja.travel.dto.PlanningComment">
+		SELECT * FROM planning_comment
+		WHERE planning_id = #{planning_id}
+		ORDER BY planning_comment_id DESC
+	</select>
+	
+	<select id="getUserByPlanningId" resultType="com.ja.travel.dto.UserDto">
+		SELECT * FROM member
+		INNER JOIN planning ON member.user_id = planning.user_id
+		WHERE planning_id = #{planning_id}
+	</select>
+
+	<select id="getUserOfCommentByPlanningId" resultType="com.ja.travel.dto.UserDto">
+		SELECT * FROM planning_comment
+		INNER JOIN member ON planning_comment.user_id = member.user_id
+		WHERE planning_comment_id = #{planning_comment_id}
+	</select>
+	
+	<select id="getPlanningList" resultType="com.ja.travel.dto.PlanningDto">
+	    SELECT *
+		FROM (
+		    SELECT p.*, ROWNUM rnum
+		    FROM (
+	            SELECT *
+	            FROM planning
+	            INNER JOIN plan ON plan.plan_id = planning.plan_id
+	            WHERE plan_statuse = '모집중'
+				
+				<if test="startDate != '' and endDate != ''">
+                    AND planning_start_date BETWEEN TO_DATE(#{startDate}, 'YYYY/MM/DD') AND TO_DATE(#{endDate}, 'YYYY/MM/DD')
+                </if>
+                
+                <if test="startDate != '' and endDate == ''">
+                	<![CDATA[
+                    AND planning_start_date >= TO_DATE(#{startDate}, 'YYYY/MM/DD')
+                    ]]>
+                </if>
+                
+                <if test="startDate == '' and endDate != ''">
+                	<![CDATA[
+                    AND planning_start_date <= TO_DATE(#{endDate}, 'YYYY/MM/DD')
+                    ]]>
+                </if>
+                
+                <if test="planningMember != ''">
+                    AND planning_member = #{planningMember}
+                </if>
+                
+                <if test="searchType != '' and searchWord == ''">
+                    <choose>
+                        <when test="searchType == 'latest'">
+                            ORDER BY planning_id DESC
+                        </when>
+                        <when test="searchType == 'old'">
+                            ORDER BY planning_id ASC
+                        </when>
+                        <when test="searchType == 'application'">
+                            ORDER BY (
+					            SELECT COUNT(*)
+					            FROM planning_application
+					            WHERE planning_application.planning_id = planning.planning_id
+					        ) DESC
+                        </when>
+                    </choose>
+                </if>
+				
+				<if test="searchType != '' and searchWord != ''">
+                    <choose>
+                        <when test="searchType == 'latest'">
+                            AND planning_title LIKE '%' || #{searchWord} || '%'
+                            ORDER BY planning_id DESC
+                        </when>
+                        <when test="searchType == 'old'">
+                            AND planning_title LIKE '%' || #{searchWord} || '%'
+                            ORDER BY planning_id ASC
+                        </when>
+                        <when test="searchType == 'application'">
+                            AND planning_title LIKE '%' || #{searchWord} || '%'
+							ORDER BY (
+					            SELECT COUNT(*)
+					            FROM planning_application
+					            WHERE planning_application.planning_id = planning.planning_id
+					        ) DESC
+                        </when>
+                    </choose>
+                </if>
+			<![CDATA[
+		    ) p
+		    WHERE ROWNUM <= ((#{pageNum}-1) * 10) + 10
+		)
+		WHERE rnum >= ((#{pageNum}-1) * 10) + 1
+	    ]]>
+	</select>
+
+	<select id="getPlaceByPlanId" resultType="com.ja.travel.dto.PlanPlaceDto">
+		SELECT plan_place.* FROM plan_place
+			INNER JOIN plan_route_city ON plan_route_city.plan_place_id = plan_place.plan_place_id
+			INNER JOIN plan_day_city ON plan_day_city.plan_day_city_id = plan_route_city.plan_day_city_id
+			INNER JOIN plan_day ON plan_day.plan_day_id = plan_day_city.plan_day_id
+		WHERE plan_day.plan_day = #{plan_day}
+		AND plan_day.plan_id = #{plan_id}
+	</select>
+
+	<select id="getPlanDayByPlanId" resultType="com.ja.travel.dto.PlanDayDto">
+		SELECT * FROM plan_day
+		INNER JOIN plan ON plan.plan_id = plan_day.plan_id
+		WHERE plan.plan_id = #{plan_id}
+	</select>
+
+	<select id="getPlanByPlanningId" resultType="com.ja.travel.dto.PlanDto">
+		SELECT * FROM planning
+		INNER JOIN plan ON plan.plan_id = planning.plan_id
+		WHERE planning_id = #{planning_id}
+	</select>
+
+	<select id="getPlanningCount" resultType="int">
+		SELECT count(*)
+		FROM
+			planning
+			INNER JOIN plan ON plan.plan_id = planning.plan_id
+		WHERE
+			plan_statuse = '모집중'
+			AND planning_title LIKE '%' || #{searchWord} || '%'
+	</select>
+
+	<select id="getPlanningByPlanningId" resultType="com.ja.travel.dto.PlanningDto">
+		SELECT * FROM planning WHERE planning_id = #{planning_id}
+	</select>
+
+	<select id="getPlanStatusByPlanId" resultType="com.ja.travel.dto.PlanningDto">
+		SELECT * FROM planning
+		INNER JOIN plan ON plan.plan_id = planning.plan_id
+		WHERE plan_statuse = '모집중'
+		AND plan.plan_id = #{plan_id}
+	</select>
+
+	<select id="getPlanningAcceptCountByPlanningId" resultType="com.ja.travel.dto.UserDto">
+		SELECT * FROM planning_application
+		INNER JOIN member ON planning_application.user_id = member.user_id
+		WHERE planning_id = #{planning_id}
+		AND planning_member_status = '수락'
+	</select>
+
+	<select id="getApplicationStatus" resultType="com.ja.travel.dto.PlanningApplicationDto">
+		SELECT * FROM planning_application
+		WHERE planning_id = #{planning_id}
+		AND user_id = #{user_id}
+	</select>
+
+	<update id="acceptApplicationaStatusByUser">
+		UPDATE planning_application
+		SET planning_member_status = '수락'
+		WHERE planning_id = ${planning_id}
+		AND user_id = ${user_id}
+	</update>
+
+	<update id="refusalApplicationaStatusByUser">
+		UPDATE planning_application
+		SET planning_member_status = '거절'
+		WHERE planning_id = ${planning_id}
+		AND user_id = ${user_id}
+	</update>
+
+	<update id="updatePlanningData">
+		UPDATE planning
+		SET
+		planning_title = #{planning_title},
+		planning_content = #{planning_content},
+		planning_start_date =
+		#{planning_start_date},
+		planning_end_date = #{planning_end_date},
+		planning_member = #{planning_member},
+		planning_start_point =
+		#{planning_start_point}
+		WHERE
+		planning_id = #{planning_id}
+	</update>
+
+	<update id="updateToRecruiting">
+		UPDATE plan SET
+		plan_statuse = '모집중'
+		WHERE plan_id = #{plan_id}
+	</update>
+
+	<insert id="insertPlanningApplicationParty">
+		INSERT INTO
+			planning_application
+		VALUES
+		(
+			planning_application_seq.nextval,
+			#{user_id},
+			#{planning_id},
+			#{planning_application_content},
+			'신청'
+		)
+	</insert>
+
+	<select id="createPlanningPK" resultType="int">
+		SELECT planning_seq.nextval FROM dual
+	</select>
+	
+	<insert id="insertPlanningData">
+		INSERT INTO
+			planning
+		VALUES
+		(
+		#{planning_id},
+		#{plan_id},
+		#{user_id},
+		#{planning_title},
+		#{planning_content},
+		TO_DATE(#{planning_start_date}, 'YYYY-MM-DD'),
+		TO_DATE(#{planning_end_date}, 'YYYY-MM-DD'),
+		#{planning_start_point},
+		#{planning_member},
+		SYSDATE
+		)
+	</insert>
+
+	<insert id="insertMyInfoWhenRecruting">
+		INSERT INTO
+			planning_application
+		VALUES
+			(
+				planning_application_seq.nextval,
+				#{user_id},
+				#{planning_id},
+				'',
+				'수락',
+				SYSDATE
+			)
+	</insert>
+	
+	<insert id="createInitComment">
+		INSERT INTO
+			planning_comment
+		VALUES
+		(
+			planning_comment_seq.nextval,
+			'',
+			#{planning_id},
+			#{user_id},
+			#{user_comment},
+			SYSDATE
+		)
+	</insert>
+	
+	<insert id="addLike">
+		INSERT INTO
+			planning_comment_love
+		VALUES
+		(
+			planning_comment_love_seq.nextval,
+			#{planning_comment_id},
+			#{user_id}
+		)
+	</insert>
+	
+	<delete id="deleteLike">
+		DELETE FROM planning_comment_love
+		WHERE planning_comment_id = #{planning_comment_id}
+		AND user_id = #{user_id}
+	</delete>
+</mapper>

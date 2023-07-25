@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.ja.travel.planPlace.mapper.PlanPlaceSqlMapper">
+
+	<!-- 댓글 테이블에서 플레이스 PK가 많은순으로 호출 -->
+	<select id="selectPlanPlaceIdOrderByComment" resultType="int">
+		SELECT plan_place_id
+		FROM plan_place_comment
+		GROUP BY plan_place_id
+		ORDER BY COUNT(plan_place_comment_id) DESC
+	</select>
+
+	<!-- 좋아요 테이블에서 플레이스 PK가 많은순으로 호출 -->
+	<select id="selectPlanPlaceIdOrderByCount" resultType="int">
+		SELECT
+		plan_place_id
+		FROM plan_place_LOVE
+		GROUP BY plan_place_id
+		ORDER BY
+		COUNT(plan_place_id) DESC
+	</select>
+
+	<!-- 플레이스 상세피이지 댓글갯수 호출 -->
+	<select id="countPlanPlaceDetailPageComment" resultType="int">
+		SELECT
+		COUNT(plan_place_id) FROM plan_place_comment WHERE plan_place_id =
+		#{plan_place_id}
+	</select>
+
+	<!-- 플레이스 상세페이지 좋아요갯수 호출 -->
+	<select id="countPlanPlaceDetailPageLove" resultType="int">
+		SELECT
+		COUNT(plan_place_id) FROM plan_place_LOVE WHERE plan_place_id = #{plan_place_id}
+	</select>
+
+	<!-- 좋아요 삭제 -->
+	<delete id="deleteLoveByPlanPlaceIdAndUserId">
+		DELETE FROM plan_place_LOVE WHERE plan_place_id =
+		#{plan_place_id} AND user_id = #{user_id}
+	</delete>
+
+	<!-- 좋아요 등록 -->
+	<insert id="insertLoveByPlanPlaceIdAndUserId">
+		INSERT INTO plan_place_LOVE VALUES(
+		plan_place_LOVE_seq.nextval,
+		#{plan_place_id},
+		#{user_id},
+		SYSDATE
+		)
+	</insert>
+
+	<!-- 좋아요 상태 확인 -->
+	<select id="searchLoveByPlanPlaceIdAndUserId"
+		resultType="com.ja.travel.dto.PlanPlaceLoveDto">
+		SELECT * FROM plan_place_LOVE WHERE plan_place_id =
+		#{plan_place_id}
+		AND user_id = #{user_id}
+	</select>
+
+	<!-- 유저 데이터 호출 -->
+	<select id="selectUserById"
+		resultType="com.ja.travel.dto.UserDto">
+		select *
+		from member
+		where
+		user_id = #{user_id}
+	</select>
+
+	<!-- PK로 모든 플레이스 댓글 리스트 호출 -->
+	<select id="selectAllPlanPlaceCommentByPlanPlaceId"
+		resultType="com.ja.travel.dto.PlanPlaceCommentDto">
+		SELECT * FROM plan_place_comment WHERE plan_place_id =
+		#{plan_place_id}
+	</select>
+
+	<!-- 유저 플레이스 게시글 댓글 등록 -->
+	<insert id="insertPlanPlaceCommentByUser">
+		INSERT INTO plan_place_comment VALUES(
+		plan_place_comment_seq.nextval,
+		#{plan_place_id},
+		#{user_id},
+		#{plan_place_user_comment},
+		SYSDATE
+		)
+	</insert>
+
+	<!-- 디테일 사진(상세사진) 호출 -->
+	<select id="selectAllPhotoByPlanPlaceId"
+		resultType="com.ja.travel.dto.PlanPlacePhotoDto">
+		SELECT * FROM plan_place_photo WHERE plan_place_id = #{plan_place_id}
+	</select>
+
+	<!-- PK로 유저데이터 호출 -->
+	<select id="selectAllUserById"
+		resultType="com.ja.travel.dto.UserDto">
+		SELECT * FROM member WHERE user_id = #{user_id}
+	</select>
+
+	<!-- PK로 플레이스 데이터 호출 -->
+	<select id="selectAllPlanPlaceById"
+		resultType="com.ja.travel.dto.PlanPlaceDto">
+		SELECT * FROM plan_place WHERE plan_place_id = #{plan_place_id}
+	</select>
+
+	<!-- 모든 플레이스 데이터 리스트 호출 -->
+	<select id="selectAllPlanPlace" resultType="com.ja.travel.dto.PlanPlaceDto">
+		<if test='sortType == null'>
+			SELECT * FROM plan_place ORDER BY plan_place_id DESC
+		</if>
+		<if test="sortType != null">
+			<choose>
+				<when test="sortType == 'recent'">
+					SELECT * FROM plan_place ORDER BY plan_place_id DESC
+				</when>
+				<when test="sortType == 'love'">
+					SELECT pp.* FROM plan_place pp ORDER BY 
+						(SELECT COUNT(*) FROM plan_place_LOVE ppl WHERE ppl.plan_place_id = pp.plan_place_id)*4 +
+						(SELECT COUNT(*) FROM plan_place_comment ppc WHERE ppc.plan_place_id = pp.plan_place_id)*1
+					DESC
+				</when>
+				<when test="sortType == 'comment'">
+					SELECT pp.* FROM plan_place pp ORDER BY 
+						(SELECT COUNT(*) FROM plan_place_comment ppc WHERE ppc.plan_place_id = pp.plan_place_id)
+					DESC
+				</when>
+				<when test="sortType == 'seoul'">
+					SELECT * FROM plan_place WHERE plan_place_address LIKE '%서울%'
+				</when>
+			</choose>
+		</if>
+	</select>
+
+	<!-- 유저 플레이스 데이터 등록 -->
+	<insert id="insertPlanPlaceByUser">
+		INSERT INTO plan_place VALUES(
+		plan_place_seq.nextval,
+		#{plan_city_id},
+		#{user_id},
+		#{plan_place_photo},
+		#{plan_place_name},
+		#{plan_place_content},
+		#{plan_place_address},
+		SYSDATE
+		)
+	</insert>
+
+	<!-- 유저 상세 이미지 데이터 등록 -->
+	<insert id="insertDetailImagesByUser">
+		INSERT INTO plan_place_photo VALUES(
+		plan_place_photo_seq.nextval,
+		#{plan_place_id},
+		#{plan_place_photo_link}
+		)
+	</insert>
+
+	<!-- 플레이스 PK 최대값 호출 -->
+	<select id="selectMaxIdFromPlanPlace" resultType="int">
+		SELECT
+		MAX(plan_place_id) FROM plan_place
+	</select>
+
+	<!-- 모든도시(시 단위) 리스트 호출 -->
+	<select id="selectAllPlanCity"
+		resultType="com.ja.travel.dto.PlanCityDto">
+		SELECT * FROM plan_city ORDER BY plan_city_id DESC
+	</select>
+</mapper>

@@ -1,0 +1,21 @@
+   function ajaxTemplete() {
+
+      const xhr = new XMLHttpRequest();
+
+      xhr.onreadystatechange = function() {
+         if (xhr.readyState == 4 && xhr.status == 200) {
+            const response = JSON.parse(xhr.responseText);
+            // js 작업//
+         }
+      }
+
+      //get
+      xhr.open("get", "요청 url?파라미터=값");
+      xhr.send();
+
+      //post
+      xhr.open("post", "요청 url");
+      xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      xhr.send("파라미터=값");
+
+   }

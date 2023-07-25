@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.travel.guidePackage.mapper.PackageSqlMapper">
+
+<select id="getGuidePlanningByGuidePlanningId" resultType="com.ja.travel.dto.GuidePlanningDto">
+		SELECT * FROM guide_planning WHERE guide_planning_id = #{guide_planning_id}
+	</select>
+
+<select id="getApplicationStatus" resultType="com.ja.travel.dto.GuidePlanningApplicationDto">
+		SELECT * FROM guide_planning_application
+		WHERE guide_planning_id = #{guide_planning_id}
+		AND user_id = #{user_id}
+	</select>
+
+<update id="acceptGuideApplicationaStatusByUser">
+		UPDATE guide_planning_application
+		SET guide_planning_member_status = '수락'
+		WHERE guide_planning_id = ${guide_planning_id}
+		AND user_id = ${user_id}
+
+</update>
+
+<update id="refusalGuideApplicationaStatusByUser">
+		UPDATE guide_planning_application
+		SET guide_planning_member_status = '거절'
+		WHERE guide_planning_id = ${guide_planning_id}
+		AND user_id = ${user_id}
+	</update>
+
+<select id="getUserIdFromGuidePlanning" resultType="int">
+
+	SELECT guide.user_id FROM guide_planning INNER JOIN guide on guide_planning.guide_id = guide.guide_id 
+WHERE guide.guide_id=#{guide_id} and guide_planning.guide_planning_id=#{guide_planning_id}
+</select>
+
+<select id="getGuidePlanningList" resultType="com.ja.travel.dto.GuidePlanningDto">
+		SELECT * FROM (
+		    SELECT p.*, ROWNUM rnum FROM (
+		        SELECT * FROM ( 
+		            SELECT * FROM guide_planning
+		            INNER JOIN plan ON plan.plan_id = guide_planning.plan_id
+		            WHERE plan_statuse = '모집'
+		        <if test="searchType != null and searchWord == null">
+		        	<choose>
+		        		<when test="searchType == 'latest'">
+		        			ORDER BY guide_planning_id DESC
+		        		</when>
+		        		<when test="searchType == 'old'">
+		        			ORDER BY guide_planning_id ASC
+		        		</when>
+		        		<when test="searchType == 'application'">
+		        			ORDER BY (
+	                            SELECT COUNT(*)
+	                            FROM guide_planning_application
+	                            WHERE guide_planning_application.guide_planning_id = guide_planning.guide_planning_id
+                        	) DESC
+		        		</when>
+		        		<when test="searchType == 'myParty'">
+		                    AND guide_planning.guide_planning_id IN (
+		                        SELECT guide_planning_id
+		                        FROM guide_planning_application
+		                        WHERE user_id = #{user_id}
+		                          AND guide_planning_member_status = '수락'
+		                    )
+                		</when>
+		        	</choose>
+		        </if>
+		        
+		        <if test="searchType != null and searchWord != null">
+		        	<choose>
+		        		<when test="searchType == 'latest'">
+		        			AND guide_planning_title LIKE '%' || #{searchWord} || '%'
+		        			ORDER BY guide_planning_id DESC
+		        		</when>
+		        		<when test="searchType == 'old'">
+		        			AND guide_planning_title LIKE '%' || #{searchWord} || '%'
+		        			ORDER BY guide_planning_id ASC
+		        		</when>
+		        		<when test="searchType == 'application'">
+	                        AND guide_planning_title LIKE '%' || #{searchWord} || '%'
+	                        ORDER BY (
+	                            SELECT COUNT(*)
+	                            FROM guide_planning_application
+	                            WHERE guide_planning_application.guide_planning_id = guide_planning.guide_planning_id
+	                        ) DESC
+                    	</when>
+                    	<when test="searchType == 'myParty'">
+		                    AND guide_planning_title LIKE '%' || #{searchWord} || '%'
+		                    AND guide_planning.guide_planning_id IN (
+		                        SELECT guide_planning_id
+		                        FROM guide_planning_application
+		                        WHERE user_id = #{user_id}
+		                          AND guide_planning_member_status = '수락'
+		                    )
+		                </when>
+		        	</choose>
+		        </if>
+		        )
+		    ) p
+		    <![CDATA[
+		    WHERE ROWNUM <= ((#{pageNum}-1) * 10) + 10
+		)
+		WHERE rnum >= ((#{pageNum}-1) * 10) + 1
+		]]>
+	</select>
+
+<select id="getPlanAndGuidePlanningInfoByPlanId" 
+resultType="com.ja.travel.dto.GuidePlanningDto">
+
+	SELECT * FROM guide_planning
+		INNER JOIN plan ON plan.plan_id = guide_planning.plan_id
+		WHERE plan_statuse = '기획'
+		AND plan.plan_id = #{plan_id}
+</select>
+
+<select id="getGuidePlanningAcceptCountByGuidePlanningId" resultType="com.ja.travel.dto.GuidePlanningApplicationDto">
+		SELECT * FROM guide_planning_application
+		WHERE guide_planning_id = #{guide_planning_id}
+		AND guide_planning_member_status = '수락'
+</select>
+
+<select id="createGuidePlanningPK"
+resultType="int">
+
+	SELECT guide_planning_seq.nextval FROM dual
+
+</select>
+
+<insert id="insertGuidePlanningData">
+	INSERT INTO
+			guide_planning
+		VALUES
+			(
+				#{guide_planning_id},
+				#{plan_id},
+				#{guide_id},
+				#{guide_planning_start_date},
+				#{guide_planning_member},
+				#{guide_planning_start_point},
+				#{guide_planning_content},
+				#{guide_planning_end_date},
+				#{guide_planning_price},
+				#{guide_planning_title},
+				SYSDATE
+			)
+
+</insert>
+
+<update id="updateToRecruiting">
+		UPDATE plan SET plan_statuse = '모집', plan_disclosure_status = '공개' WHERE plan_id = #{plan_id}
+	</update>
+
+<update id="updateToPlanning">
+
+	UPDATE plan SET plan_statuse = '기획'  WHERE plan_id = #{plan_id}
+
+</update>
+
+<update id="updateGuidePlanningData">
+
+	UPDATE guide_planning SET guide_planning_start_date = #{guide_planning_start_date},
+			guide_planning_member = #{guide_planning_member},
+			guide_planning_start_point=#{guide_planning_start_point},
+			guide_planning_content = #{guide_planning_content},
+				guide_planning_end_date=#{guide_planning_end_date},
+				guide_planning_price=#{guide_planning_price}
+				guide_planning_title=#{guide_planning_title} WHERE guide_planning_id = #{guide_planning_id}
+
+</update>
+
+<insert id="insertMyInfoWhenRecruting">
+
+	INSERT INTO guide_planning_application VALUES (
+			guide_planning_application_seq.nextval, 
+			#{user_id},
+			#{guide_planning_id},
+			'',
+			'수락'
+	 )
+
+</insert>
+
+<select id="getPlanDay" resultType="com.ja.travel.dto.PlanDayDto">
+	SELECT * FROM plan_day WHERE plan_id = #{plan_id}
+</select>
+
+<select id="getPlaceByPlanId" resultType="com.ja.travel.dto.PlanPlaceDto">
+	
+	SELECT plan_place.* FROM plan_place
+		INNER JOIN plan_route_city ON plan_route_city.plan_place_id = plan_place.plan_place_id
+		INNER JOIN plan_day_city ON plan_day_city.plan_day_city_id = plan_route_city.plan_day_city_id
+		INNER JOIN plan_day ON plan_day.plan_day_id = plan_day_city.plan_day_id
+		WHERE plan_day.plan_day = #{plan_day}
+		AND plan_day.plan_id = #{plan_id}
+
+</select>
+
+
+
+<select id="getPlanByGuidePlanningId" resultType="com.ja.travel.dto.PlanDto">
+
+	SELECT * FROM guide_planning
+		INNER JOIN plan ON plan.plan_id = guide_planning.plan_id
+		WHERE guide_planning_id = #{guide_planning_id}
+
+</select>
+
+<select id="getUserByGuidePlanningId" resultType="com.ja.travel.dto.UserDto">
+	SELECT * FROM member 
+    INNER JOIN guide on member.user_id = guide.user_id
+    INNER JOIN guide_planning on guide.guide_id = guide_planning.guide_id 
+    WHERE guide_planning_id=#{guide_planning_id}
+
+</select>
+
+<select id="getPlanDayByPlanId" resultType = "com.ja.travel.dto.PlanDayDto">
+	SELECT * FROM plan_day
+		INNER JOIN plan ON plan.plan_id = plan_day.plan_id
+		WHERE plan.plan_id = #{plan_id}
+
+</select>
+
+<select id="getCityByPlace" resultType="com.ja.travel.dto.PlanCityDto">
+	
+	SELECT * FROM plan_city WHERE plan_city_id = #{plan_city_id}
+	
+</select>
+
+
+
+
+<select id="getPlanDayCityByCityIdAndDayId" resultType="com.ja.travel.dto.PlanDayCityDto">
+		select * from plan_day_city
+		where plan_day_id = #{dayId} 
+		and plan_city_id = #{cityId}
+	</select>
+
+	
+<select id="createGuideAppPk" resultType="int">
+	
+	select guide_planning_application_seq.nextval from dual
+
+</select>
+
+<select id="createPackagePayPk" resultType="int">
+	
+	select guide_plan_payment_seq.nextval from dual
+
+</select>
+
+<select id ="getPackage" resultType="com.ja.travel.dto.GuidePlanningDto">
+	
+	select * from guide_planning WHERE guide_planning_id = #{guide_planning_id}
+
+</select>
+
+<insert id="insertGuidePay">
+	
+	insert into guide_plan_payment values(
+		#{guide_plan_payment_id},
+		#{planning_application_id},
+		SYSDATE,
+		#{user_name},
+		#{user_planning_deposit},
+		''
+	
+	)
+	
+
+</insert>
+
+<select id="getGuideInfoByGuidePlanningId" resultType="com.ja.travel.dto.GuideDto">
+	
+	select * from guide where guide_id=#{guide_id}
+
+</select>
+
+<select id="getMyCouponList" resultType="com.ja.travel.dto.UserCouponDto">
+
+	SELECT * FROM user_coupon WHERE user_id = #{user_id}
+
+</select>
+
+<select id="getCouponInfo" resultType="com.ja.travel.dto.CouponDto">
+	
+	SELECT * FROM coupon WHERE coupon_id=#{couponId}
+
+</select>
+
+
+
+<select id="getTotalLike" resultType="int">
+		SELECT COUNT(*) FROM guide_planning_comment_love
+		WHERE guide_planning_comment_id = #{guide_planning_comment_id}
+</select>
+	
+<select id="getCommentList" resultType="com.ja.travel.dto.GuidePlanningComment">
+		SELECT * FROM guide_planning_comment
+		WHERE guide_planning_id = #{guide_planning_id}
+		ORDER BY guide_planning_comment_id DESC
+</select>
+
+	<insert id="createInitComment">
+		INSERT INTO
+			guide_planning_comment
+		VALUES
+		(
+			guide_planning_comment_seq.nextval,
+			'',
+			#{guide_planning_id},
+			#{user_id},
+			#{user_comment},
+			SYSDATE
+		)
+	</insert>
+	
+	<insert id="addLike">
+		INSERT INTO
+			guide_planning_comment_love
+		VALUES
+		(
+			guide_planning_co_love_seq.nextval,
+			#{guide_planning_comment_id},
+			#{user_id}
+		)
+	</insert>
+	
+	<delete id="deleteLike">
+		DELETE FROM guide_planning_comment_love
+		WHERE guide_planning_comment_id = #{guide_planning_comment_id}
+		AND user_id = #{user_id}
+	</delete>
+	
+<select id="getLikeByCommentIdAndUserId" resultType="com.ja.travel.dto.GuidePlanningCommentLove">
+		SELECT * FROM guide_planning_comment_love
+		WHERE guide_planning_comment_id = #{guide_planning_comment_id}
+		AND user_id = #{user_id}
+	</select>
+
+	<select id="getUserOfCommentByPlanningId" resultType="com.ja.travel.dto.UserDto">
+		SELECT * FROM guide_planning_comment
+		INNER JOIN member ON guide_planning_comment.user_id = member.user_id
+		WHERE guide_planning_comment_id = #{guide_planning_comment_id}
+	</select>
+	
+
+
+	
+</mapper>

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.travel.hotel.mapper.HotelSqlMapper">
+
+	<select id="countFacility" resultType="Integer">
+		SELECT COUNT(*) FROM hotel_facility_line WHERE hotel_id = #{hotel_id}
+	</select>
+
+	<select id="searchHotelFacilityByHotelFacilityId" resultType="com.ja.travel.dto.HotelFacilityDto">
+		SELECT * FROM hotel_facility WHERE hotel_facility_id = #{hotel_facility_id}
+	</select>
+
+	<select id="searchHotelFacilityLineByHotelId" resultType="com.ja.travel.dto.HotelFacilityLineDto">
+		SELECT * FROM hotel_facility_line WHERE hotel_id = #{hotel_id}
+	</select>
+
+	<insert id="insertHotelFacilityLine">
+		INSERT INTO hotel_facility_line VALUES(
+			hotel_facility_line_seq.nextval,
+			#{hotel_id},
+			#{hotel_facility_id}
+		)
+	</insert>
+	
+	<insert id="insertHotelFacility">
+		INSERT INTO hotel_facility VALUES(
+			hotel_facility_seq.nextval,
+			#{hotel_facility_name},
+			#{hotel_facility_image}
+		)
+	</insert>
+
+	<select id="selectHotelCategoryById" resultType="com.ja.travel.dto.HotelCategoryDto">
+		SELECT * FROM hotel_category WHERE hotel_category_id = #{hotel_category_id}
+	</select>
+
+	<select id="selectReviewByHotelReservationId" resultType="com.ja.travel.dto.HotelReviewDto">
+		SELECT * FROM hotel_review WHERE hotel_reservation_id = #{hotel_reservation_id}
+	</select>
+
+	<select id="searchCountReview" resultType="Integer">
+		SELECT count(hotel_review_id) AS average_review_point
+			FROM hotel_reservation hr
+			JOIN hotel_review hrev ON hr.hotel_reservation_id = hrev.hotel_reservation_id
+			WHERE hotel_id = #{hotel_id}
+			GROUP BY hr.hotel_id
+	</select>
+
+	<select id="searchCountReviewPoint" resultType="double">
+		SELECT ROUND(AVG(hrev.hotel_review_point),2) AS average_review_point
+			FROM hotel_reservation hr
+			JOIN hotel_review hrev ON hr.hotel_reservation_id = hrev.hotel_reservation_id
+			WHERE hotel_id = #{hotel_id}
+			GROUP BY hr.hotel_id
+	</select>
+
+	<select id="selectHotelReviewByHotelReservationId" resultType="com.ja.travel.dto.HotelReviewDto">
+		SELECT * FROM hotel_review WHERE hotel_reservation_id = #{hotel_reservation_id}
+	</select>
+
+	<select id="selectHotelReservationByHotelId" resultType="com.ja.travel.dto.HotelReservationDto">
+		SELECT * FROM hotel_reservation WHERE hotel_id = #{hotel_id}
+	</select>
+
+	<insert id="insertReviewByUser">
+		INSERT INTO hotel_review VALUES(
+			hotel_review_seq.nextval,
+			#{hotel_reservation_id},
+			#{hotel_review_point},
+			#{hotel_review_content},
+			SYSDATE
+		)
+	</insert>
+
+	<select id="selectHotelReservationByUser" resultType="com.ja.travel.dto.HotelReservationDto">
+		SELECT * FROM hotel_reservation WHERE user_id = #{user_id}
+	</select>
+
+	<select id="selectHotelByUser" resultType="com.ja.travel.dto.HotelDto">
+		SELECT * FROM hotel WHERE user_id = #{user_id}
+	</select>
+	
+	<insert id="insertHotelReservationByUser">
+		INSERT INTO hotel_reservation VALUES(
+			hotel_reservation_seq.nextval,
+			#{hotel_id},
+			#{user_id},
+			#{hotel_reservation_check_in},
+			#{hotel_reservation_check_out},
+			SYSDATE
+		)
+	</insert>
+
+	<select id="selectHotelByHotelId" resultType="com.ja.travel.dto.HotelDto">
+		SELECT * FROM hotel WHERE hotel_id = #{hotel_id}
+	</select>
+
+	<select id="selectAllHotelImageDetailsByHotelId" resultType="com.ja.travel.dto.HotelImageDetailsDto">
+		SELECT * FROM hotel_image_details WHERE hotel_id = #{hotel_id}
+	</select>
+
+	<select id="selectAllHotelList" resultType="com.ja.travel.dto.HotelDto">
+		SELECT * FROM hotel WHERE 1 = 1 
+		<choose>
+			<when test="sortType == 'house'">
+				AND hotel_category = '주택' ORDER BY hotel_id DESC
+			</when>
+			<when test="sortType == 'apartment'">
+				AND hotel_category = '아파트' ORDER BY hotel_id DESC
+			</when>
+			<when test="sortType == 'logHouse'">
+				AND hotel_category = '통나무집' ORDER BY hotel_id DESC
+			</when>
+			<when test="sortType == 'campingCar'">
+				AND hotel_category = '캠핑카' ORDER BY hotel_id DESC
+			</when>
+			<when test="sortType == 'hotel'">
+				AND hotel_category = '호텔' ORDER BY hotel_id DESC
+			</when>
+			<when test="sortType == 'farm'">
+				AND hotel_category = '농장' ORDER BY hotel_id DESC
+			</when>
+			<when test="sortType == 'tent'">
+				AND hotel_category = '텐트' ORDER BY hotel_id DESC
+			</when>
+			<when test="sortType == 'guestHouse'">
+				AND hotel_category = '게스트용 별채' ORDER BY hotel_id DESC
+			</when>
+			<when test="sortType == 'castle'">
+				AND hotel_category = '캐슬' ORDER BY hotel_id DESC
+			</when>
+			<when test="sortType == 'boat'">
+				AND hotel_category = '보트' ORDER BY hotel_id DESC
+			</when>
+			<when test="sortType == 'treeHouse'">
+				AND hotel_category = '트리하우스' ORDER BY hotel_id DESC
+			</when>
+			<when test="sortType == 'smallHouse'">
+				AND hotel_category = '초소형 주택' ORDER BY hotel_id DESC
+			</when>
+			<when test="sortType == 'windmill'">
+				AND hotel_category = '풍차' ORDER BY hotel_id DESC
+			</when>
+			<when test="sortType == 'cave'">
+				AND hotel_category = '동굴' ORDER BY hotel_id DESC
+			</when>
+			<when test="sortType == 'containerHouse'">
+				AND hotel_category = '컨테이너하우스' ORDER BY hotel_id DESC
+			</when>
+		</choose>
+	</select>
+
+	<insert id="insertHotelDetailImageByUser">
+		INSERT INTO hotel_image_details VALUES(
+		hotel_image_details_seq.nextval,
+		#{hotel_id},
+		#{hotel_image_details_link}
+		)
+	</insert>
+
+	<!-- <select id="selectMaxHotelId" resultType="int">
+		SELECT
+		MAX(hotel_id)
+		FROM hotel
+	</select> -->
+
+	<insert id="insertHotel">
+		INSERT INTO hotel VALUES(
+		#{hotel_id},
+		#{user_id},
+		#{hotel_category},
+		#{hotel_title},
+		#{hotel_main_image},
+		#{hotel_content},
+		#{hotel_address},
+		#{hotel_price},
+		#{hotel_bedRoom},
+		#{hotel_bed},
+		#{hotel_bathRoom},
+		#{hotel_limit_number},
+		#{hotel_check_in_time},
+		#{hotel_check_out_time},
+		#{hotel_reserve_start_date},
+		#{hotel_reserve_end_date},
+		SYSDATE
+		)
+	</insert>
+
+	<select id="selectAllHotelCategoryList"
+		resultType="com.ja.travel.dto.HotelCategoryDto">
+		SELECT * FROM hotel_category ORDER BY hotel_category_id DESC
+	</select>
+	
+	<select id="createPk" resultType="int">
+		SELECT hotel_seq.nextval 
+		FROM DUAL
+	</select>
+	
+	<insert id="insertHotelImages">
+		INSERT INTO hotel_image_details VALUES(
+			#{hotel_image_details_id},
+			#{hotel_id},
+			#{hotel_image_details_link}
+		)
+	</insert>
+</mapper>

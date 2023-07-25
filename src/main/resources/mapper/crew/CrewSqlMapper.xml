@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.travel.crew.mapper.CrewMapper">
+
+	<insert id="sendnotification">
+		insert into user_notification values (
+			user_notification_seq.nextval,
+			#{user_id},
+			#{user_notification_content},
+			#{user_notification_link},
+			sysdate,
+			'N',
+			#{sender_image}
+		)
+	</insert>
+
+	<select id="checkcrewname" resultType="Integer">
+		select count(*) from crew natural join crew_close where crew_status != 'closed' and crew_name = #{crew_name}
+	</select>
+
+	<select id="checkcrewdomain" resultType="Integer">
+		select count(*) from crew natural join crew_close where crew_status != 'closed' and crew_domain = #{crew_domain}
+	</select>
+
+	<select id="getCrewDtoByUserId" resultType="com.ja.travel.dto.CrewDto">
+		select * from crew
+		where crew_domain = (
+		  select crew_domain from crew_member
+		  where user_id = #{user_id} and (crew_join_status = 'member' or crew_join_status = 'applied')
+		)
+
+	</select>
+	
+	<select id="getAllCrewListOrderByPopularity" resultType="com.ja.travel.dto.CrewDto">
+		select * from crew order by crew_point desc, crew_reg_date 
+	</select>
+	
+	<select id="getMyCrewInfo" resultType="com.ja.travel.dto.CrewMemberDto">
+		select * from crew_member where user_id = #{user_id} and crew_join_status = 'member'
+	</select>
+	
+	<select id="getAppliedMemberInfo" resultType="com.ja.travel.dto.CrewMemberDto">
+		select * from crew_member where user_id = #{user_id} and crew_join_status = 'applied'
+	</select>
+	
+	<select id="getGradeNameByGradeId" resultType="String">
+		select crew_member_grade_default_name from crew_member_grade_default where crew_member_grade_default_id = #{crew_member_grade_default_id}
+	</select>
+	
+	<insert id="createcrew">
+		insert into crew values(
+			crew_seq.nextval,
+			#{master_id},
+			#{crew_name},
+			null,
+			#{crew_desc},
+			0,
+			sysdate,
+			#{crew_domain}
+		)
+	</insert>
+	
+	<select id="getcrewdomain" resultType="Integer">
+		select max(crew_id) from crew
+	</select>
+	
+	<select id="getCrewDomainByMasterId" resultType="String">
+		select crew_domain from crew where master_id = #{master_id}
+	</select>
+	
+	<insert id="addcrewmember">
+		insert into crew_member values(
+			crew_member_seq.nextval,
+			#{user_id},
+			#{crew_domain},
+			#{crew_member_grade_default_id},
+			#{crew_join_request_intro},
+			sysdate,
+			#{crew_join_status},
+			sysdate
+		)
+	</insert>
+	
+	<select id="getUserNameById" resultType="String">
+		select user_nickname from member where user_id=#{master_id}
+	</select>
+	
+	<select id="getCrewDtoByCrewDomain" resultType="com.ja.travel.dto.CrewDto">
+		select * from crew where crew_domain = #{crew_domain}
+	</select>
+	
+	<select id="getMyPointByCrewMemberId" resultType="Integer">
+		select sum(crew_member_point_change) from crew_member_point where crew_member_id = #{crew_member_id}
+	</select>
+	
+	
+	<select id="getMyAllRequestLogByUserId" resultType="com.ja.travel.dto.CrewMemberDto">
+		select * from crew_member where user_id = #{user_id} order by crew_member_log_date
+	</select>
+	
+	<insert id="boardwrite">
+		insert into crew_board values (
+			crew_board_seq.nextval,
+			#{crew_member_id},
+			#{crew_domain},
+			#{crew_board_title},
+			#{crew_board_notice},
+			#{crew_board_content},
+			sysdate,
+			'published',
+			null,
+			#{crew_board_visibility}
+		)
+	</insert>
+	
+	<select id="getBoardId" resultType="int">
+		select max(crew_board_id) from crew_board where crew_member_id = #{crew_member_id}
+	</select>
+	
+	<select id="getAllPostByCrewDomain" resultType="com.ja.travel.dto.CrewBoardDto">
+		select * from crew_board where crew_domain=#{crew_domain} and crew_board_status != 'deleted' and crew_board_notice = 'N' order by crew_board_id desc
+	</select>
+	
+	<select id="getCrewOnlyPostByCrewDomain" resultType="com.ja.travel.dto.CrewBoardDto">
+		select * from crew_board where crew_domain=#{crew_domain} and crew_board_visibility = 'private' order by crew_board_id desc
+	</select>
+	
+	<select id="getAllNoticeByCrewDomain" resultType="com.ja.travel.dto.CrewBoardDto">
+		select * from crew_board where crew_domain=#{crew_domain} and crew_board_notice = 'Y' and crew_board_status != 'deleted' order by crew_board_id desc
+	</select>
+	
+	<select id="getAllPublicPostByCrewDomain" resultType="com.ja.travel.dto.CrewBoardDto">
+		select * from crew_board where crew_domain=#{crew_domain} and crew_board_visibility = 'public' and crew_board_status != 'deleted' and crew_board_notice = 'N' order by crew_board_id desc
+	</select>
+	
+	<select id="getAllPublicNoticeByCrewDomain" resultType="com.ja.travel.dto.CrewBoardDto">
+		select * from crew_board where crew_domain=#{crew_domain} and crew_board_visibility = 'public' and crew_board_notice = 'Y' order by crew_board_id desc
+	</select>
+	
+	<select id="getUserDtoByCrewMemberId" resultType="com.ja.travel.dto.UserDto">
+		select * from member where user_id = (select user_id from crew_member where crew_member_id = #{crew_member_id})
+	</select>
+	
+	<update id="boarddelete">
+		update crew_board set crew_board_status = 'deleted' where crew_board_id = #{crew_board_id}
+	</update>
+	
+	<select id="getCrewDomainByCrewBoardId" resultType="String">
+		select crew_domain from crew_board where crew_board_id = #{crew_board_id}
+	</select>
+	
+	<select id="getAllCrewRequestByCrewDomain" resultType="com.ja.travel.dto.CrewMemberDto">
+		select * from crew_member where crew_domain = #{crew_domain} and crew_join_status = 'applied'
+	</select>
+	
+	<select id="getUserDtoByUserId" resultType="com.ja.travel.dto.UserDto">
+		select * from member where user_id = #{user_id}
+	</select>
+	
+	<select id="getCrewMemberListByCrewDomain" resultType="com.ja.travel.dto.CrewMemberDto">
+		select * from crew_member where crew_domain = #{crew_domain} and crew_join_status = 'member' order by crew_member_grade_default_id
+	</select>
+	
+	<update id="requestaccept" parameterType="java.util.List">
+		update crew_member set crew_join_status = 'member', crew_member_log_date = sysdate where crew_member_id in
+		<foreach item="item" collection="list" open="(" close=")" separator=",">
+		    #{item}
+		  </foreach>
+	</update>
+	
+	<update id="requestdecline" parameterType="java.util.List">
+		update crew_member set crew_join_status = 'decline', crew_member_log_date = sysdate where crew_member_id in
+	<foreach item="item" collection="list" open="(" close=")" separator=",">
+		  #{item}
+	</foreach>
+	
+	</update>
+	
+	<select id="getCrewDomainByCrewMemberId" resultType="String">
+		select crew_domain from crew_member where crew_member_id = #{crew_member_id}
+	</select>
+	
+	<insert id="addCrewBoardAttached">
+		insert into crew_board_attached values(
+			crew_board_attached_seq.nextval,
+			#{crew_board_id},
+			#{crew_board_attached},
+			#{crew_board_original_attached}
+		)
+	</insert>
+	
+	<select id="getCrewBoardDtoByCrewBoardId" resultType="com.ja.travel.dto.CrewBoardDto">
+		select * from crew_board where crew_board_id = #{crew_board_id}
+	</select>
+	
+	<select id="getAllCommentByCrewBoardId" resultType="com.ja.travel.dto.CrewBoardCommentDto">
+		select * from crew_board_comment where crew_board_id = #{crew_board_id} and crew_comment_updated = 'none'
+	</select>
+	
+	<insert id="writecomment">
+		insert into crew_board_comment values (
+			crew_board_comment_seq.nextval,
+			#{crew_board_id},
+			#{crew_member_id},
+			#{crew_comment},
+			sysdate,
+			null,
+			'none'
+		)
+	</insert>
+	
+	<select id="getCrewMemberDtoByUserId" resultType="com.ja.travel.dto.CrewMemberDto">
+		select * from crew_member where user_id= #{user_id} and crew_join_status = 'member'
+	</select>
+	
+	<update id="deletecomment">
+		update crew_board_comment set crew_comment_deleted_date = sysdate, crew_comment_updated = 'deleted' where board_comment_id = #{board_comment_id}
+	</update>
+	
+	<select id="getCrewBoardDtoByBoardCommentId" resultType="com.ja.travel.dto.CrewBoardDto">
+		select * from crew_board where crew_board_id = (select crew_board_id from crew_board_comment where board_comment_id = #{board_comment_id})
+	</select>
+	
+	<insert id="likeboard">
+		insert into crew_board_like values (
+			crew_board_like_seq.nextval,
+			#{crew_board_id},
+			#{crew_member_id},
+			sysdate
+		)
+	</insert>
+	
+	<select id="getBoardLikeListByCrewBoardId" resultType="Integer">
+		select crew_member_id from crew_board_like where crew_board_id = #{crew_board_id}
+	</select>
+	
+	<select id="getMyLikedBoardListByCrewMemberId" resultType="com.ja.travel.dto.CrewBoardDto">
+		select * from crew_board where crew_board_id = (select crew_board_id from crew_board_like where crew_member_id = #{crew_member_id})
+	</select>
+	
+	<delete id="dislikeboard">
+		delete from crew_board_like where crew_board_id = #{crew_board_id} and crew_member_id = #{crew_member_id}
+	</delete>
+	
+	<insert id="crewclose">
+		insert into crew_close values (
+			crew_close_seq.nextval,
+			#{crew_id},
+			'closing',
+			sysdate
+		)
+	</insert>
+	
+	<select id="getCrewCloseDateByCrewDomain" resultType="Date">
+		select crew_close_date from crew_close where crew_id = (select crew_id from crew where crew_domain = #{crew_domain})
+	</select>
+	
+	<delete id="crewclosecancel">
+		delete from crew_close where crew_id = #{crew_id}
+	</delete>
+	
+	<select id="getMyBoardListByCrewMemberId" resultType="com.ja.travel.dto.CrewBoardDto">
+		select * from crew_board where crew_member_id = #{crew_member_id} and crew_domain = #{crew_domain} and crew_board_status != 'deleted'
+	</select>
+	
+	<select id="getMyCommentListByCrewMemberId" resultType="com.ja.travel.dto.CrewBoardCommentDto">
+		select * from crew_board_comment where crew_member_id = #{crew_member_id} and crew_comment_updated!='deleted'
+	</select>
+	
+	<update id="bancrewmemberid" parameterType="java.util.List">
+		update crew_member set crew_join_status ='banned' WHERE crew_member_id IN
+		  <foreach item="item" collection="list" open="(" close=")" separator=",">
+		    #{item}
+		  </foreach>
+	</update>
+	
+	<select id="getSelectedMemberBySearchcont" resultType="com.ja.travel.dto.CrewMemberDto">
+  SELECT *
+  FROM crew_member
+  WHERE crew_join_status = 'member' and user_id IN (
+    SELECT user_id
+    FROM member
+    WHERE user_nickname LIKE '%' || #{searchcont} || '%' or user_email LIKE  '%' || #{searchcont} || '%' 
+  )
+	</select>
+	
+	<select id="getSelectedappliedBySearchcont" resultType="com.ja.travel.dto.CrewMemberDto">
+  SELECT *
+  FROM crew_member
+  WHERE crew_join_status = 'applied' and user_id IN (
+    SELECT user_id
+    FROM member
+    WHERE user_nickname LIKE '%' || #{searchcont} || '%' or user_email LIKE  '%' || #{searchcont} || '%' 
+  )
+	</select>
+	
+	<update id="boardmodify">
+		update crew_board set crew_board_status = 'modified', crew_board_title = #{crew_board_title}, crew_board_content = #{crew_board_content}, crew_board_visibility = #{crew_board_visibility}, crew_board_update_date = sysdate  where crew_board_id = #{crew_board_id}
+	</update>
+	
+	<select id="getLastCrewBoardIdByCrewMemberId" resultType="Integer">
+		select max(crew_board_id) from crew_board where crew_member_id = #{crew_member_id}
+	</select>
+	
+	<update id="addCrewThumbnailByCrewDomain">
+		update crew set crew_thumbnail = #{crew_thumbnail} where crew_domain = #{crew_domain}
+	</update>
+	
+	<select id="getcrewlistbysearchword" resultType="com.ja.travel.dto.CrewDto">
+		select * from crew where crew_name like '%' || #{searchWord} || '%' or crew_domain like '%' || #{searchWord} || '%' or master_id = (select user_id from member where user_nickname like '%' || #{searchWord} || '%')
+	</select>
+	
+	<select id="getAllPostByCrewMemberId" resultType="com.ja.travel.dto.CrewBoardDto">
+		select * from crew_board where crew_member_id = #{crew_member_id}
+	</select>
+	
+	<select id="getUserDtoBySearchWord" resultType="com.ja.travel.dto.UserDto">
+		select * from member where user_nickname like '%' || #{searchword} || '%' and user_id = (select user_id from crew_member where crew_domain = #{crew_domain} and crew_join_status = 'member')
+	</select>
+	
+	<select id="getCrewBoardAttachedByCrewBoardId" resultType="com.ja.travel.dto.CrewBoardAttachedDto">
+		select * from crew_board_attached where crew_board_id = #{crew_board_id}
+	</select>
+	
+	<select id="getPostListByCrewDomainAndSearchWord" resultType="com.ja.travel.dto.CrewBoardDto">
+		select * from crew_board where crew_domain = #{crew_domain} and crew_board_content like '%' || #{searchword} || '%'
+	</select>
+	
+	<select id="getmynoticebyuserid" resultType="com.ja.travel.dto.UserNotificationDto">
+		select * from user_notification where user_id = #{user_id} order by user_notification_read desc, user_notification_id desc
+	</select>
+	
+	<delete id="cancelmycrewrequestbyuserid">
+		delete from crew_member where user_id = #{user_id} and crew_join_status = 'applied'
+	</delete>
+	
+	<insert id="addPoint">
+		insert into crew_member_point values (
+			crew_member_point_seq.nextval,
+			#{crew_member_id},
+			#{crew_member_point_reason},
+			#{crew_member_point_change},
+			sysdate
+		)
+	</insert>
+	
+	<select id="getchatbycrewdomain" resultType="com.ja.travel.dto.CrewChatDto">
+		select * from crew_chat where crew_domain = #{crew_domain}
+	</select>
+	
+	<insert id="sendchat">
+		insert into crew_chat values (
+		    crew_chat_seq.nextval,
+		    #{crew_member_id},
+		    #{crew_domain},
+		    #{crew_chat_text},
+		     sysdate
+		)
+	</insert>
+</mapper>
