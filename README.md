@@ -40,7 +40,7 @@ TripStation은 사용자가 여행을 계획하고 동행을 찾을 수 있는 �
 이 프로젝트에서 저는 아래 기능의 개발을 담당했습니다:
 
 1. **로그인 페이지**: 사용자 로그인 기능과 카카오 로그인 기능을 구현했습니다.
-<img src="https://github.com/waz6432/web-portfolio/assets/103208820/6adf6dd6-3279-44ea-911f-8f9985ba2cbf"  width="auto" height="auto"/>
+<img src="https://github.com/waz6432/web-portfolio/assets/103208820/19588c90-8ad9-4a6e-8240-3a51ce191d59"  width="auto" height="auto"/>
 
 3. **여행 플랜 작성**: 사용자가 여행 플랜을 작성하고 동행을 모집할 수 있는 페이지를 구현했습니다.
 4. **메인 페이지**: 동행 모집 리스트를 무한 스크롤로 보여주는 기능과 검색 기능을 구현했습니다.
