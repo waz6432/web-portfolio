@@ -1,4 +1,4 @@
-<img src="https://capsule-render.vercel.app/api?type=waving&color=auto&height=200&section=header&text=TripStation&fontSize=90" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=auto&height=150&section=header&text=TripStation&fontSize=90" />
 
 <div align=Center>
 	<p>✨Tech Stack ✨</p>	
