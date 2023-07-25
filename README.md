@@ -1,21 +1,34 @@
 <img src="https://capsule-render.vercel.app/api?type=waving&color=auto&height=200&section=header&text=TripStation&fontSize=90" />
 
-<div style="display: flex; justify-content: space-between;">
-	<div>
-		<p>✨Tech Stack ✨</p>
-		<img src="https://img.shields.io/badge/Java-ED8B00?style=flat&logo=java&logoColor=white" />  
-		<img src="https://img.shields.io/badge/Oracle-F80000?style=flat&logo=oracle&logoColor=white" />
-		<img src="https://img.shields.io/badge/Spring-6DB33F?style=flat&logo=spring&logoColor=white" />
-		<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black" />  
-		<img src="https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white" />
-		<img src="https://img.shields.io/badge/CSS-1572B6?style=flat&logo=css3&logoColor=white" />
-		<br>
-		<p>🛠 Tools 🛠</p>
-		<img src="https://img.shields.io/badge/Spring Tool Suite 3-007ACC?style=flat&logo=Java&logoColor=white" />
-		<img src="https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white" />
-	</div>
-	<a href="https://github.com/waz6432"><img align="center" style="height:180px" src="https://github-readme-stats.vercel.app/api/top-langs/?username=waz6432&layout=compact&theme=nord&hide_border=true" /></a>
-</div>
+<table>
+  <tr>
+    <td valign="top" width="50%">
+
+✨Tech Stack ✨
+
+<img src="https://img.shields.io/badge/Java-ED8B00?style=flat&logo=java&logoColor=white" />  
+<img src="https://img.shields.io/badge/Oracle-F80000?style=flat&logo=oracle&logoColor=white" />
+<img src="https://img.shields.io/badge/Spring-6DB33F?style=flat&logo=spring&logoColor=white" />
+<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black" />  
+<img src="https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white" />
+<img src="https://img.shields.io/badge/CSS-1572B6?style=flat&logo=css3&logoColor=white" />
+
+🛠 Tools 🛠
+
+<img src="https://img.shields.io/badge/Spring Tool Suite 3-007ACC?style=flat&logo=Java&logoColor=white" />
+<img src="https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white" />
+
+    </td>
+    <td valign="top" width="50%">
+
+<a href="https://github.com/waz6432">
+  <img align="center" style="height:180px" src="https://github-readme-stats.vercel.app/api/top-langs/?username=waz6432&layout=compact&theme=nord&hide_border=true" />
+</a>
+
+    </td>
+  </tr>
+</table>
+
 
 # 프로젝트 <img src="https://user-images.githubusercontent.com/103208820/210212608-e28cdd0e-d35e-44b2-b65b-69003b248ea4.png"  width="30" height="30"/>
 
