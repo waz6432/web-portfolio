@@ -46,7 +46,7 @@ TripStation은 사용자가 여행을 계획하고 동행을 찾을 수 있는 �
 <img src="https://github.com/waz6432/web-portfolio/assets/103208820/e0d1746f-3c37-4abf-9047-07c73a6747b5"  width="auto" height="auto"/>
 
 3. **메인 페이지**: 동행 모집 리스트를 무한 스크롤로 보여주는 기능과 검색 기능을 구현했습니다.
-<img src="https://github.com/waz6432/web-portfolio/assets/103208820/e25c7454-978a-41a9-b978-8afc68600ba3"  width="auto" height="auto"/>
+<img src="https://github.com/waz6432/web-portfolio/assets/103208820/20136661-882a-411e-a273-5e48bf899bd0"  width="auto" height="auto"/>
 
 4. **동행 상세 페이지**: 동행 모집에 대한 상세 내용을 보여주고, 사용자가 댓글을 작성하거나 모집에 참여한 사람들끼리 채팅할 수 있는 기능을 구현했습니다.
 <img src="https://github.com/waz6432/web-portfolio/assets/103208820/d2c56c84-2d53-4404-a3f2-5e190a11833f"  width="auto" height="auto"/>
