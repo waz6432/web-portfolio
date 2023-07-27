@@ -25,6 +25,10 @@
 
 TripStation은 여행 동행을 찾는 사람들을 위한 웹사이트입니다. 사용자는 원하는 여행지와 일정을 입력하면, 같은 여행지를 방문하는 다른 여행자들을 찾아볼 수 있습니다.
 
+## ERD
+URL : https://www.erdcloud.com/d/9qrBEmjMs3Q7WXasL
+<img src="https://github.com/waz6432/web-portfolio/assets/103208820/acd2881e-40f8-4e14-93f1-83824524dd35"  width="auto" height="auto"/>
+
 ## 주요 기능
 
 TripStation은 사용자가 여행을 계획하고 동행을 찾을 수 있는 다양한 기능을 제공합니다:
