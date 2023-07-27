@@ -30,8 +30,6 @@ URL : https://www.erdcloud.com/d/9qrBEmjMs3Q7WXasL
 <br>
 <img src="https://github.com/waz6432/web-portfolio/assets/103208820/89786468-1ae7-406d-aa3e-d6d8317f155b" height="auto" width="auto"/>
 
-<br>
-
 ## 주요기능
 
 TripStation은 사용자가 여행을 계획하고 동행을 찾을 수 있는 다양한 기능을 제공합니다:
