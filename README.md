@@ -25,11 +25,6 @@
 
 TripStation은 여행 동행을 찾는 사람들을 위한 웹사이트입니다. 사용자는 원하는 여행지와 일정을 입력하면, 같은 여행지를 방문하는 다른 여행자들을 찾아볼 수 있습니다.
 
-## ERD
-URL : https://www.erdcloud.com/d/9qrBEmjMs3Q7WXasL
-<br>
-<img src="https://github.com/waz6432/web-portfolio/assets/103208820/89786468-1ae7-406d-aa3e-d6d8317f155b" height="auto" width="auto"/>
-
 ## 주요기능
 
 TripStation은 사용자가 여행을 계획하고 동행을 찾을 수 있는 다양한 기능을 제공합니다:
@@ -39,6 +34,11 @@ TripStation은 사용자가 여행을 계획하고 동행을 찾을 수 있는 �
 3. **크루 기능**: 사용자는 크루를 만들거나 기존 크루에 가입할 수 있습니다. 크루의 회원들은 동행 모집 기능을 통해 같이 여행을 갈 수 있습니다.
 4. **맞춤 여행**: 사용자는 자신이 작성한 플랜을 기반으로 동행을 모집하고, 같이 여행을 갈 수 있습니다.
 5. **패키지 여행**: 가이드가 작성한 플란에 신청을 하면, 패키지 여행에 참여할 수 있습니다.
+
+## ERD
+URL : https://www.erdcloud.com/d/9qrBEmjMs3Q7WXasL
+<br>
+<img src="https://github.com/waz6432/web-portfolio/assets/103208820/89786468-1ae7-406d-aa3e-d6d8317f155b" height="auto" width="auto"/>
 
 ## 프로젝트에서의 역할
 
