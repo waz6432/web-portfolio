@@ -27,7 +27,7 @@ TripStation은 여행 동행을 찾는 사람들을 위한 웹사이트입니다
 
 ## ERD
 URL : https://www.erdcloud.com/d/9qrBEmjMs3Q7WXasL
-<img src="https://github.com/waz6432/web-portfolio/assets/103208820/acd2881e-40f8-4e14-93f1-83824524dd35"  width="100%" height="auto"/>
+<img src="https://github.com/waz6432/web-portfolio/assets/103208820/acd2881e-40f8-4e14-93f1-83824524dd35"  width="100%" height="auto" align="left"/>
 
 ## 주요 기능
 
