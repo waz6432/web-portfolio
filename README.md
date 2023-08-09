@@ -36,7 +36,7 @@ TripStation은 사용자가 여행을 계획하고 동행을 찾을 수 있는 �
 5. **패키지 여행**: 가이드가 작성한 플란에 신청을 하면, 패키지 여행에 참여할 수 있습니다.
 
 ## ERD
-URL : https://www.erdcloud.com/d/9qrBEmjMs3Q7WXasL
+URL : [https://www.erdcloud.com/d/9qrBEmjMs3Q7WXasL](https://www.erdcloud.com/d/XsYr9wajSLxhNGvEZ)
 <br>
 <img src="https://github.com/waz6432/web-portfolio/assets/103208820/89786468-1ae7-406d-aa3e-d6d8317f155b" height="auto" width="auto"/>
 
