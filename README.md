@@ -59,5 +59,3 @@ URL : [https://www.erdcloud.com/d/9qrBEmjMs3Q7WXasL](https://www.erdcloud.com/d/
 
 5. **마이 페이지**: 사용자의 개인 정보와 여행 플랜, 참여한 동행 모집 등을 관리할 수 있는 마이 페이지를 구현했습니다.
 <img src="https://github.com/waz6432/web-portfolio/assets/103208820/a2afcbae-dd31-4cc3-9d02-48deec4d44dd"  width="auto" height="auto"/>
-
-이러한 기능들을 통해 사용자가 원활하게 웹사이트를 이용하고, 여행 동행을 찾을 수 있도록 도왔습니다.
